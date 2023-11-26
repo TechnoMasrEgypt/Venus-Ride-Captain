@@ -19,6 +19,7 @@ class ChatCubit extends Cubit<ChatState> {
   final chatRepo = ChatRepo();
   List<MessageModel> messages = [];
 
+  //String? userId;
 //send message firebase
   // void sendMessageFirebase({
   //   required String message,
@@ -146,6 +147,7 @@ class ChatCubit extends Cubit<ChatState> {
           print(message);
           print(userId);
           print(createdAt);
+          print(userId);
           print('000000000000000');
         });
         messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
@@ -153,4 +155,13 @@ class ChatCubit extends Cubit<ChatState> {
       }
     });
   }
+
+  void resetMessageCount() {
+    messages.clear();
+    emit(ResetMessageList()); // Emit a new state with an empty messages list
+  }
+
+  // bool isDriver({required String driverId}) {
+  //   return userId == driverId; // Check if the user's ID matches the driver's ID
+  // }
 }

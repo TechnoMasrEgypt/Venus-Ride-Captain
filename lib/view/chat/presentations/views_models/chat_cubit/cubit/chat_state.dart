@@ -15,7 +15,7 @@ class ChatInilLoading extends ChatState {}
 
 class ChatSuccessState extends ChatState {
   final List<MessageModel> messages;
-  const ChatSuccessState({required this.messages});
+  ChatSuccessState({required this.messages});
 }
 
 class SendMessageLoading extends ChatState {}
@@ -29,3 +29,5 @@ class ListenMessageRequest extends ChatState {}
 class ListenMessageLoading extends ChatState {}
 
 class ListenMessageLoaded extends ChatState {}
+
+class ResetMessageList extends ChatState {}

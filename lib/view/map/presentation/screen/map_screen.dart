@@ -25,6 +25,8 @@ import 'package:venus_driver/widgets/custom_back_dialog.dart';
 import 'package:venus_driver/widgets/custom_drawer.dart';
 import 'package:venus_driver/widgets/custom_icon_back.dart';
 
+import '../../../chat/presentations/views_models/chat_cubit/cubit/chat_cubit.dart';
+
 class MapScreen extends StatefulWidget {
   const MapScreen({required this.tripDetails, super.key});
   final TripDetails? tripDetails;
@@ -59,13 +61,20 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => MapCubit()
-        ..setCustomMarker()
-        ..getPolyPoints(double.parse(widget.tripDetails!.currentLat),
-            double.parse(widget.tripDetails!.currentLng))
-        ..getCurrentPositionUpdate()
-        ..cancleRideFireBase(context),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => MapCubit()
+            ..setCustomMarker()
+            ..getPolyPoints(double.parse(widget.tripDetails!.currentLat),
+                double.parse(widget.tripDetails!.currentLng))
+            ..getCurrentPositionUpdate()
+            ..cancleRideFireBase(context),
+        ),
+        BlocProvider(
+            create: (context) => ChatCubit()
+              ..getAllMessages(rideId: int.parse(widget.tripDetails!.ride))),
+      ],
       child: BlocBuilder<MapCubit, MapState>(
         builder: (context, state) {
           final cubit = MapCubit.of(context);
@@ -412,42 +421,87 @@ class _MapScreenState extends State<MapScreen> {
                                                 )
                                               : const Icon(Icons.attach_money),
                                           const Spacer(),
-                                          InkWell(
-                                            onTap: () async {
-                                              await MagicRouter.navigateTo(
-                                                  ChatView(
-                                                      driverName:
-                                                          widget.tripDetails!
+                                          BlocBuilder<ChatCubit, ChatState>(
+                                            builder: (context, state) {
+                                              final cubit =
+                                                  ChatCubit.get(context);
+                                              // final driver = cubit.isDriver(
+                                              //     driverId: widget.iDdriver);
+                                              // int messageCount = cubit
+                                              //         .messages.isNotEmpty
+                                              //     ? cubit.messages.length
+                                              //     : 0; {
+                                              return InkWell(
+                                                onTap: () async {
+                                                  await MagicRouter.navigateTo(
+                                                      ChatView(
+                                                          driverName: widget
+                                                              .tripDetails!
                                                               .clientName,
-                                                      rideId: int.parse(widget
-                                                          .tripDetails!.ride)));
+                                                          rideId: int.parse(
+                                                              widget
+                                                                  .tripDetails!
+                                                                  .ride)));
+                                                  cubit.resetMessageCount();
+                                                },
+                                                child: Stack(
+                                                  clipBehavior: Clip.none,
+                                                  children: [
+                                                    Container(
+                                                      height: 44.h,
+                                                      width: 80.w,
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          15.r)),
+                                                          color: Colors.green),
+                                                      child: Center(
+                                                          child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceEvenly,
+                                                        children: [
+                                                          Text(
+                                                            'Chat',
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize:
+                                                                    15.0.sp,
+                                                                color: Colors
+                                                                    .white),
+                                                          ),
+                                                        ],
+                                                      )),
+                                                    ),
+                                                    // cubit.messages.any((message) =>
+                                                    //             message.userId
+                                                    //                 .toString() ==
+                                                    //             CacheHelper.getData(
+                                                    //                     key:
+                                                    //                         'id')
+                                                    //                 .toString()) &&
+                                                    cubit.messages.isNotEmpty
+                                                        ? Positioned(
+                                                            right: -4,
+                                                            top: -8,
+                                                            child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  shape: BoxShape
+                                                                      .circle),
+                                                              width: 20.w,
+                                                              height: 20.h,
+                                                            ))
+                                                        : SizedBox()
+                                                  ],
+                                                ),
+                                              );
                                             },
-                                            child: Container(
-                                              height: 44.h,
-                                              width: 80.w,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              15.r)),
-                                                  color: Colors.green),
-                                              child: Center(
-                                                  child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  Text(
-                                                    'Chat',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 15.0.sp,
-                                                        color: Colors.white),
-                                                  ),
-                                                ],
-                                              )),
-                                            ),
                                           ),
                                           SizedBox(
                                             width: 10.w,
@@ -455,7 +509,7 @@ class _MapScreenState extends State<MapScreen> {
                                           InkWell(
                                             onTap: () {
                                               launch(
-                                                  'tel:${int.parse(widget.tripDetails!.phone)}');
+                                                  'tel://${int.parse(widget.tripDetails!.phone)}');
                                             },
                                             child: Container(
                                               height: 44.h,
