@@ -1,0 +1,43 @@
+import 'package:flutter/material.dart';
+import 'package:html/parser.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../global_variables.dart';
+import '../widgets/ProgressDialog.dart';
+
+class HelperMethods {
+  static void disableLocationUpdates() {
+    positionStream.pause();
+  }
+
+  static void cancleLocationUpdates() {
+    positionStream.cancel();
+  }
+
+  static void enableLocationUpdates() {
+    positionStream.resume();
+  }
+
+  static void showProgressDialog(context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) =>
+          ProgressDialog(status: 'Please wait...'),
+    );
+  }
+
+  static Future<void> openMap(double lat, double long) async {
+    String googleMapUrl = 'google.navigation:&q=$lat,$long';
+    if (await canLaunchUrl(Uri.parse(googleMapUrl))) {
+      await launchUrl(Uri.parse(googleMapUrl));
+    }
+  }
+
+  static String parseHtmlString(String htmlString) {
+    final document = parse(htmlString);
+    final String parsedString =
+        parse(document.body!.text).documentElement!.text;
+
+    return parsedString;
+  }
+}

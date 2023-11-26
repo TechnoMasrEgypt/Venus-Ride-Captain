@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1086435084834",
+    "firebase_url": "https://venus-captin-default-rtdb.firebaseio.com",
+    "project_id": "venus-captin",
+    "storage_bucket": "venus-captin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086435084834:android:6125bc96e71c34e4cdd87b",
+        "android_client_info": {
+          "package_name": "com.technomasr.venusridecaptin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1086435084834-rhs0cpq2g31tglvpujatishp9078bp91.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBrwYkFi0uyjLdSl5whTcbWjXQO9c_8kw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1086435084834-rhs0cpq2g31tglvpujatishp9078bp91.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,67 @@
+// DO NOT EDIT. This is code generated via package:easy_localization/generate.dart
+
+abstract class  LocaleKeys {
+  static const availableRequests = 'availableRequests';
+  static const accept = 'accept';
+  static const arrived = 'arrived';
+  static const availableBalance = 'availableBalance';
+  static const cancel = 'cancel';
+  static const confirm = 'confirm';
+  static const confirmPassword = 'confirmPassword';
+  static const contact = 'contact';
+  static const contactUs = 'contactUs';
+  static const endTrip = 'endTrip';
+  static const faq = 'faq';
+  static const forgetPassword = 'forgetPassword';
+  static const logOut = 'logOut';
+  static const newPassword = 'newPassword';
+  static const password = 'password';
+  static const previousCancelFees = 'previousCancelFees';
+  static const privacy = 'privacy';
+  static const ratings = 'ratings';
+  static const resendCode = 'resendCode';
+  static const rideHistory = 'rideHistory';
+  static const signIn = 'signIn';
+  static const subTotal = 'subTotal';
+  static const support = 'support';
+  static const trip = 'trip';
+  static const tripFare = 'tripFare';
+  static const wallet = 'wallet';
+  static const walletHistory = 'walletHistory';
+  static const yourTripHasEnded = 'yourTripHasEnded';
+  static const noInternetConnectivity = 'noInternetConnectivity';
+  static const validEmailAddress = 'validEmailAddress';
+  static const validPassword = 'validPassword';
+  static const similarPassword = 'similarPassword';
+  static const codeSend = 'codeSend';
+  static const sms = 'sms';
+  static const verificationCode = 'verificationCode';
+  static const changeLanguage = 'changeLanguage';
+  static const youTravelled = 'youTravelled';
+  static const km = 'km';
+  static const mins = 'mins';
+  static const inx = 'inx';
+  static const followOnSocialMedia = 'followOnSocialMedia';
+  static const sendaMessage = 'sendaMessage';
+  static const yourMessageHere = 'yourMessageHere';
+  static const submit = 'submit';
+  static const phoneNumber = 'phoneNumber';
+  static const yes = 'yes';
+  static const exitApp = 'exitApp';
+  static const online = 'online';
+  static const offline = 'offline';
+  static const cancelRide = 'cancelRide';
+  static const dinar = 'dinar';
+  static const pleaseStartTheTrip = 'pleaseStartTheTrip';
+  static const ok = 'ok';
+  static const startTrip = 'startTrip';
+  static const nowAvailableRequests = 'nowAvailableRequests';
+  static const nowNotAvailableRequests = 'nowNotAvailableRequests';
+  static const emailOrPhoneNumber = 'emailOrPhoneNumber';
+  static const clientCancleRide = 'clientCancleRide';
+  static const back = 'back';
+  static const areYouSure = 'areYouSure';
+  static const no = 'no';
+  static const cancleFee = 'cancleFee';
+
+}
