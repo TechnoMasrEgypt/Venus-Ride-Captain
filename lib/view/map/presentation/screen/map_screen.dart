@@ -464,7 +464,8 @@ class _MapScreenState extends State<MapScreen> {
                                                                 .spaceEvenly,
                                                         children: [
                                                           Text(
-                                                            'Chat',
+                                                            LocaleKeys.chat
+                                                                .tr(),
                                                             style: TextStyle(
                                                                 fontWeight:
                                                                     FontWeight

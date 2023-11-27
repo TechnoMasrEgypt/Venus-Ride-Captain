@@ -63,5 +63,6 @@ abstract class  LocaleKeys {
   static const areYouSure = 'areYouSure';
   static const no = 'no';
   static const cancleFee = 'cancleFee';
+  static const chat = 'chat';
 
 }

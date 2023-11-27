@@ -143,10 +143,7 @@ class ChatCubit extends Cubit<ChatState> {
               createdAt: createdAt.toString());
           messages.add(newMessage);
           print('000000000000000');
-          print(id);
           print(message);
-          print(userId);
-          print(createdAt);
           print(userId);
           print('000000000000000');
         });

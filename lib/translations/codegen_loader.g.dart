@@ -76,7 +76,8 @@ class CodegenLoader extends AssetLoader{
   "back": "Back",
   "areYouSure": "Are you sure?",
   "no": "No",
-  "cancleFee": "Half a dinar will be deducted when canceling the trip"
+  "cancleFee": "Half a dinar will be deducted when canceling the trip",
+  "chat": "Chat"
 };
 static const Map<String,dynamic> ar = {
   "availableRequests": "الطلبات المتاحة",
@@ -140,7 +141,8 @@ static const Map<String,dynamic> ar = {
   "back": "عودة",
   "areYouSure": "هل أنت متأكد ؟",
   "no": "لا",
-  "cancleFee": "سوف يتم خصم نصف دينار عند إلغاء الرحلة"
+  "cancleFee": "سوف يتم خصم نصف دينار عند إلغاء الرحلة",
+  "chat": "محادثة"
 };
 static const Map<String, Map<String,dynamic>> mapLocales = {"en": en, "ar": ar};
 }
