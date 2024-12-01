@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1086435084834:android:6125bc96e71c34e4cdd87b",
+        "mobilesdk_app_id": "1:1086435084834:android:11fc57730ff799a8cdd87b",
         "android_client_info": {
-          "package_name": "com.technomasr.venusridecaptin"
+          "package_name": "com.techmasr.venuscaptin"
         }
       },
       "oauth_client": [
@@ -30,6 +30,81 @@
             {
               "client_id": "1086435084834-rhs0cpq2g31tglvpujatishp9078bp91.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1086435084834-7kmkh3jlipj838buj2qkkc49bfhbbl43.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.technomasr.venusridecaptin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086435084834:android:6125bc96e71c34e4cdd87b",
+        "android_client_info": {
+          "package_name": "com.technomasr.venusridecaptin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1086435084834-j8vh5caa7us0q1ercitl5olso0d0p6o7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.technomasr.venusridecaptin",
+            "certificate_hash": "91e795d5e7749a01b9cf171ced7f5fdc4d48877e"
+          }
+        },
+        {
+          "client_id": "1086435084834-p1js8hmfobb3i4mbeqsukehtirbkuk0n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.technomasr.venusridecaptin",
+            "certificate_hash": "22adb2c2aacfdd131739c88ecf016d4808d97862"
+          }
+        },
+        {
+          "client_id": "1086435084834-sdor3qpaft3s5sohhod1ij51g601dmaq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.technomasr.venusridecaptin",
+            "certificate_hash": "3a731b61d8cab2eb67de08efc045ceafbdab62ea"
+          }
+        },
+        {
+          "client_id": "1086435084834-srnrho58bc4bdc9ofkdgmutastjh45ct.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.technomasr.venusridecaptin",
+            "certificate_hash": "dd0421af9892e5d8b2cd81f58944b6e7fe3fc32b"
+          }
+        },
+        {
+          "client_id": "1086435084834-rhs0cpq2g31tglvpujatishp9078bp91.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBrwYkFi0uyjLdSl5whTcbWjXQO9c_8kw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1086435084834-rhs0cpq2g31tglvpujatishp9078bp91.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1086435084834-7kmkh3jlipj838buj2qkkc49bfhbbl43.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.technomasr.venusridecaptin"
+              }
             }
           ]
         }

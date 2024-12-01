@@ -106,7 +106,10 @@ class _MapScreenState extends State<MapScreen> {
                   child: const CircleAvatar(
                     backgroundColor: BrandColors.colorPrimary,
                     radius: 25,
-                    child: Icon(Icons.navigation_rounded),
+                    child: Icon(
+                      Icons.navigation_rounded,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -124,6 +127,7 @@ class _MapScreenState extends State<MapScreen> {
                         false;
                   },
                   child: SlidingUpPanel(
+                    defaultPanelState: PanelState.OPEN,
                     maxHeight: MediaQuery.of(context).size.height / 1.90,
                     minHeight: 125.w,
                     controller: cubit.panelController,
@@ -509,8 +513,10 @@ class _MapScreenState extends State<MapScreen> {
                                           ),
                                           InkWell(
                                             onTap: () {
-                                              launch(
-                                                  'tel://${int.parse(widget.tripDetails!.phone)}');
+                                              launch(widget.tripDetails!
+                                                      .callphone()
+                                                  // 'tel://${int.parse(widget.tripDetails!.phone)}'
+                                                  );
                                             },
                                             child: Container(
                                               height: 44.h,

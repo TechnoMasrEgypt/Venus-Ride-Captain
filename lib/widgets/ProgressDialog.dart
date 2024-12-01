@@ -1,8 +1,10 @@
 // ignore_for_file: must_be_immutable, library_prefixes, use_key_in_widget_constructors, file_names
 
 import 'package:flutter/material.dart';
-import 'package:gradient_ui_widgets/gradient_ui_widgets.dart'
-    as GradientWidgets;
+import 'package:venus_driver/widgets/preparing.dart'as GradientWidgets;
+//import 'package:gradient_widgets_plus/gradient_widgets_plus.dart';
+//import 'package:gradient_ui/progress_indicator/gradient_progress_indicator.dart'
+   // as GradientWidgets;
 
 import '../utils/brand_colors.dart';
 
@@ -11,7 +13,7 @@ class ProgressDialog extends StatelessWidget {
 
   ProgressDialog({required this.status});
 
-  Gradient g1 = const LinearGradient(
+  Gradient g1 =  LinearGradient(
     colors: [
       BrandColors.colorPrimary,
       Colors.white,
@@ -39,10 +41,13 @@ class ProgressDialog extends StatelessWidget {
                 valueGradient: g1,
                 backgroundColor: Colors.grey[200],
               ),
+//GradientCircularProgressIndicator(),
+            
               const SizedBox(
                 width: 25,
               ),
               Text(
+                
                 status,
                 style: const TextStyle(fontSize: 15),
               )

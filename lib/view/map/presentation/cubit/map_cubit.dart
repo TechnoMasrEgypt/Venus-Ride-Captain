@@ -103,6 +103,7 @@ class MapCubit extends Cubit<MapState> {
         MagicRouter.navigateTo(TripScreen(tripDetails: tripDetails));
       },
     );
+    panelController.open();
   }
 
   Future rideWay(

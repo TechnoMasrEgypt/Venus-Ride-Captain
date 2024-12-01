@@ -1,14 +1,19 @@
+import 'dart:async';
 import 'dart:developer';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:venus_driver/appStorage/local_cache_helper.dart';
 import 'package:venus_driver/bloc_observer.dart';
+import 'package:venus_driver/view/auth/presentation/screens/login_screen.dart';
+import 'package:venus_driver/view/home/presentation/screen/home_screen.dart';
 import 'package:venus_driver/widgets/error_internet_screen.dart';
 import 'package:venus_driver/firebase_options.dart';
 import 'package:venus_driver/global_variables.dart';
@@ -18,93 +23,107 @@ import 'package:venus_driver/translations/codegen_loader.g.dart';
 import 'package:venus_driver/view/splash/splash_screen.dart';
 import 'package:wakelock/wakelock.dart';
 
+//import 'package:external_app_launcher/external_app_launcher.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
-  log("Handling a background message: ${message.messageId}");
+  print("ddddddd:${message.toString()}");
+  print("Handling a background message: ${message.messageId}");
+  print("essssss");
+
+  // _navigateToScreenFromNotification();
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await Firebase.initializeApp(
-    name: "VenusCaptin",
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await EasyLocalization.ensureInitialized();
-  await CacheHelper.init();
-  Bloc.observer = AppBlocObserver();
-  Wakelock.enable();
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-  const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'high_importance_channel', // id
-    'High Importance Notifications', // title
-    // description
-    importance: Importance.max,
-  );
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  runZonedGuarded<Future<void>>(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      name: "VenusCaptin",
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
+    await EasyLocalization.ensureInitialized();
 
-  log('User granted permission: ${settings.authorizationStatus}');
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    log('Got a message whilst in the foreground!');
-    log('Message data: ${message.data}');
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-    if (message.notification != null) {
-      log('Message also contained a notification: ${message.notification}');
-    }
-  });
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    log('Got a message whilst in the foreground!');
-    log('Message data: ${message.data}');
+    await CacheHelper.init();
+    Bloc.observer = AppBlocObserver();
+    Wakelock.enable();
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      // description
+      importance: Importance.max,
+    );
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    print('User granted permission: ${settings.authorizationStatus}');
+    /*FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
 
     if (message.notification != null) {
-      log('Message also contained a notification: ${message.notification}');
-    }
-  });
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification!.android;
+      print('Message also contained a notification: ${message.notification}');
+    }*/
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('Got a message whilst in the foreground!');
+      print('Message data: ${message.data}');
 
-    if (notification != null && android != null) {
-      flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'channel id',
-              'channel name',
-              channelDescription: 'channel description',
-              priority: Priority.high,
-              importance: Importance.high,
-              fullScreenIntent: true,
-              icon: '@mipmap/ic_launcher',
-            ),
-            iOS: DarwinNotificationDetails(),
-          ));
-    }
-  });
-  runApp(EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('ar')],
-      assetLoader: const CodegenLoader(),
-      path: 'assets/translations',
-      fallbackLocale: const Locale('en'),
-      child: const MyApp()));
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+    });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification!.android;
+      print("essssss");
+      // _navigateToScreenFromNotification();
+
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            const NotificationDetails(
+              android: AndroidNotificationDetails(
+                'channel id',
+                'channel name',
+                channelDescription: 'channel description',
+                priority: Priority.high,
+                importance: Importance.high,
+                fullScreenIntent: true,
+                icon: '@mipmap/ic_launcher',
+              ),
+              iOS: DarwinNotificationDetails(),
+            ));
+      }
+    });
+    runApp(EasyLocalization(
+        supportedLocales: const [Locale('en'), Locale('ar')],
+        assetLoader: const CodegenLoader(),
+        path: 'assets/translations',
+        fallbackLocale: const Locale('en'),
+        child: const MyApp()));
+  },
+      (error, stack) =>
+          FirebaseCrashlytics.instance.recordError(error, stack, fatal: true));
 }
 
 class MyApp extends StatefulWidget {

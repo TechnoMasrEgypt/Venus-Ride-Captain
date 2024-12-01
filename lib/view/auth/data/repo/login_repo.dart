@@ -20,7 +20,8 @@ class LoginRepo {
     }, headers: {
       'lang': CacheHelper.getData(key: 'lang'),
     });
-    log(CacheHelper.getData(key: 'token'));
+    //log(CacheHelper.getData(key: 'token'));
+    print("device token is " + CacheHelper.getData(key: 'token'));
     log(CacheHelper.getData(key: 'lang'));
     try {
       if (response.statusCode == 200 && response.data['status'] == 'success') {

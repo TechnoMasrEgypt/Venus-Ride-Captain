@@ -18,3 +18,7 @@ class EditProfileDetailsLoading extends ProfileState {}
 class StatusLoaded extends ProfileState {}
 
 class StatusLoading extends ProfileState {}
+
+class changeimageintial extends ProfileState {}
+
+class changeimagefone extends ProfileState {}

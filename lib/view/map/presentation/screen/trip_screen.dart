@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:venus_driver/appStorage/local_cache_helper.dart';
 import 'package:venus_driver/dataModels/trip_details.dart';
 import 'package:venus_driver/global_variables.dart';
 import 'package:venus_driver/helpers/helper_methods.dart';
+import 'package:venus_driver/helpers/hex_color.dart';
 import 'package:venus_driver/router/router.dart';
 import 'package:venus_driver/translations/locale_keys.g.dart';
 import 'package:venus_driver/utils/brand_colors.dart';
+import 'package:venus_driver/view/chat/presentations/views/chat_view.dart';
+import 'package:venus_driver/view/chat/presentations/views_models/chat_cubit/cubit/chat_cubit.dart';
 import 'package:venus_driver/view/home/presentation/screen/home_screen.dart';
 import 'package:venus_driver/view/map/presentation/cubit/map_cubit.dart';
 import 'package:venus_driver/widgets/custom_auth_button.dart';
@@ -41,12 +45,19 @@ class _TripScreenState extends State<TripScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => MapCubit()
-        ..setCustomMarker()
-        ..getPolyPoints(double.parse(widget.tripDetails!.distanceLat),
-            double.parse(widget.tripDetails!.distanceLng))
-        ..getCurrentPositionUpdate(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => MapCubit()
+            ..setCustomMarker()
+            ..getPolyPoints(double.parse(widget.tripDetails!.distanceLat),
+                double.parse(widget.tripDetails!.distanceLng))
+            ..getCurrentPositionUpdate(),
+        ),
+        BlocProvider(
+            create: (context) => ChatCubit()
+              ..getAllMessages(rideId: int.parse(widget.tripDetails!.ride))),
+      ],
       child: BlocBuilder<MapCubit, MapState>(
         builder: (context, state) {
           final cubit = MapCubit.of(context);
@@ -110,7 +121,10 @@ class _TripScreenState extends State<TripScreen> {
                     child: const CircleAvatar(
                       backgroundColor: BrandColors.colorPrimary,
                       radius: 25,
-                      child: Icon(Icons.navigation_rounded),
+                      child: Icon(
+                        Icons.navigation_rounded,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -182,37 +196,210 @@ class _TripScreenState extends State<TripScreen> {
                               : Positioned(
                                   bottom: 30,
                                   right: 90,
-                                  child: customAuthButton(
-                                      text: startTrip
-                                          ? LocaleKeys.endTrip.tr()
-                                          : LocaleKeys.startTrip.tr(),
-                                      onTap: () {
-                                        setState(() {
-                                          if (!startTrip) {
-                                            startTrip = !startTrip;
-                                            cubit.rideWay(widget.tripDetails,
-                                                widget.tripDetails!.ride);
-                                          } else {
-                                            cubit.getDirectionDetails(
-                                                endPosition: LatLng(
-                                                    currentPosition.latitude,
-                                                    currentPosition.longitude),
-                                                rideID:
-                                                    widget.tripDetails!.ride,
-                                                startPosition: LatLng(
-                                                    double.parse(widget
-                                                        .tripDetails!
-                                                        .currentLat),
-                                                    double.parse(widget
-                                                        .tripDetails!
-                                                        .currentLng)));
-                                            HelperMethods
-                                                .cancleLocationUpdates();
-                                          }
-                                        });
-                                      },
-                                      hight: 50.h,
-                                      width: 250.w),
+                                  child: SizedBox(
+                                    height: 110.h,
+                                    //  width: double.infinity,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        if (!startTrip)
+                                          SizedBox(
+                                            width: 250.w,
+                                            height: 50.h,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                BlocBuilder<ChatCubit,
+                                                    ChatState>(
+                                                  builder: (context, state) {
+                                                    final cubit =
+                                                        ChatCubit.get(context);
+                                                    // final driver = cubit.isDriver(
+                                                    //     driverId: widget.iDdriver);
+                                                    // int messageCount = cubit
+                                                    //         .messages.isNotEmpty
+                                                    //     ? cubit.messages.length
+                                                    //     : 0; {
+                                                    return InkWell(
+                                                      onTap: () async {
+                                                        await MagicRouter
+                                                            .navigateTo(ChatView(
+                                                                driverName: widget
+                                                                    .tripDetails!
+                                                                    .clientName,
+                                                                rideId: int
+                                                                    .parse(widget
+                                                                        .tripDetails!
+                                                                        .ride)));
+                                                        cubit
+                                                            .resetMessageCount();
+                                                      },
+                                                      child: Stack(
+                                                        clipBehavior: Clip.none,
+                                                        children: [
+                                                          Container(
+                                                            height: 44.h,
+                                                            width: 80.w,
+                                                            decoration: BoxDecoration(
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(15
+                                                                            .r)),
+                                                                color: Colors
+                                                                    .green),
+                                                            child: Center(
+                                                                child: Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceEvenly,
+                                                              children: [
+                                                                Text(
+                                                                  LocaleKeys
+                                                                      .chat
+                                                                      .tr(),
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      fontSize:
+                                                                          15.0
+                                                                              .sp,
+                                                                      color: Colors
+                                                                          .white),
+                                                                ),
+                                                              ],
+                                                            )),
+                                                          ),
+                                                          // cubit.messages.any((message) =>
+                                                          //             message.userId
+                                                          //                 .toString() ==
+                                                          //             CacheHelper.getData(
+                                                          //                     key:
+                                                          //                         'id')
+                                                          //                 .toString()) &&
+                                                          cubit.messages
+                                                                  .isNotEmpty
+                                                              ? Positioned(
+                                                                  right: -4,
+                                                                  top: -8,
+                                                                  child:
+                                                                      Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: Colors
+                                                                            .red,
+                                                                        shape: BoxShape
+                                                                            .circle),
+                                                                    width: 20.w,
+                                                                    height:
+                                                                        20.h,
+                                                                  ))
+                                                              : SizedBox()
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                                SizedBox(
+                                                  width: 10.w,
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    launch(widget.tripDetails!
+                                                            .callphone()
+                                                        // 'tel://${int.parse(widget.tripDetails!.phone)}'
+                                                        );
+                                                  },
+                                                  child: Container(
+                                                    height: 44.h,
+                                                    width: 121.w,
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    15.r)),
+                                                        color: BrandColors
+                                                            .deepBlue),
+                                                    child: Center(
+                                                        child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        const CircleAvatar(
+                                                          radius: 17.5,
+                                                          backgroundColor:
+                                                              Colors.white,
+                                                          child:
+                                                              Icon(Icons.phone),
+                                                        ),
+                                                        Text(
+                                                          LocaleKeys.contact
+                                                              .tr(),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 15.0.sp,
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                      ],
+                                                    )),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        SizedBox(
+                                          height: 50.h,
+                                          // width: double.infinity,
+                                          // width: double.infinity,
+                                          child: customAuthButton(
+                                              text: startTrip
+                                                  ? LocaleKeys.endTrip.tr()
+                                                  : LocaleKeys.startTrip.tr(),
+                                              onTap: () {
+                                                setState(() {
+                                                  if (!startTrip) {
+                                                    startTrip = !startTrip;
+                                                    cubit.rideWay(
+                                                        widget.tripDetails,
+                                                        widget
+                                                            .tripDetails!.ride);
+                                                  } else {
+                                                    cubit.getDirectionDetails(
+                                                        endPosition: LatLng(
+                                                            currentPosition
+                                                                .latitude,
+                                                            currentPosition
+                                                                .longitude),
+                                                        rideID: widget
+                                                            .tripDetails!.ride,
+                                                        startPosition: LatLng(
+                                                            double.parse(widget
+                                                                .tripDetails!
+                                                                .currentLat),
+                                                            double.parse(widget
+                                                                .tripDetails!
+                                                                .currentLng)));
+                                                    HelperMethods
+                                                        .cancleLocationUpdates();
+                                                  }
+                                                });
+                                              },
+                                              hight: 50.h,
+                                              width: 250.w),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 )
                         ],
                       ),

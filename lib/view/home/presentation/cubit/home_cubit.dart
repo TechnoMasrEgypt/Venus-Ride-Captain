@@ -10,13 +10,23 @@ import 'package:venus_driver/appStorage/local_cache_helper.dart';
 import 'package:venus_driver/dataModels/trip_details.dart';
 import 'package:venus_driver/global_variables.dart';
 import 'package:venus_driver/router/router.dart';
+import 'package:venus_driver/view/auth/presentation/screens/login_screen.dart';
 import 'package:venus_driver/view/home/data/model/ride_request_details.dart';
 import 'package:venus_driver/view/home/data/repo/home_repo.dart';
+import 'package:venus_driver/view/home/presentation/screen/home_screen.dart';
 import 'package:venus_driver/view/map/presentation/screen/map_screen.dart';
 import 'package:venus_driver/widgets/custom_cancle_dialog.dart';
 import 'package:venus_driver/widgets/custom_snackbar.dart';
 
 part 'home_state.dart';
+
+void _navigateToScreenFromNotification() {
+  if (CacheHelper.getData(key: 'login') == true) {
+    MagicRouter.navigateAndPopAll(const HomeScreen());
+  } else {
+    MagicRouter.navigateAndPopAll(const LoginScreen());
+  }
+}
 
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(HomeInitial());
@@ -90,6 +100,7 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void updateLocation() async {
+    print("update success");
     await refDriversInfo.set({
       "name": CacheHelper.getData(key: 'name'),
       "location": {
@@ -107,7 +118,9 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   Future getRequest() async {
-    refRequset.onValue.listen((DatabaseEvent event) {
+    print("Start requestes");
+    refRequset.onValue.listen((DatabaseEvent event) async {
+      print("start enant ${event.snapshot.value} ");
       checkData = event.snapshot.value;
       emit(GetRequest());
       if (event.snapshot.value == null) {
@@ -122,6 +135,13 @@ class HomeCubit extends Cubit<HomeState> {
           showNotification: true,
         );
         assetsAudioPlayer.play();
+        print("Doneeeee");
+        print("Before launch app");
+        // Add delay before launching app
+        await Future.delayed(Duration(milliseconds: 500));
+
+      
+        print("After launch app");
         String startRide = data['startRide'].toString();
         String endRide = data['endRide'].toString();
         String phone = data['phone'].toString();

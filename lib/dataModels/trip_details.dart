@@ -30,4 +30,10 @@ class TripDetails {
     required this.ride,
     required this.rideType,
   });
+  //بشيل كود الدولة  الى هو اول 3 ارقام فخلى بالك لو زوتواكزد الدول فى المستقبل غير ده
+  String callphone() {
+    String modifiedString = phone.substring(4);
+
+    return 'tel://${modifiedString}';
+  }
 }

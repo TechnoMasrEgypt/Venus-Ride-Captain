@@ -35,6 +35,12 @@ class ProfileCubit extends Cubit<ProfileState> {
     );
   }
 
+  void changeimage(XFile? image) {
+    emit(changeimageintial());
+    photo = image;
+    emit(changeimagefone());
+  }
+
   Future driverStatus(status) async {
     emit(StatusLoaded());
     final res = await profileRepo.driverStatus(status);
