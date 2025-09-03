@@ -47,13 +47,15 @@ Widget customRequestCard({
                   SizedBox(
                     width: 10.w,
                   ),
-                  Text(
-                    name.toUpperCase(),
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18.0.sp,
-                        color: Colors.black),
-                  ),
+                   Text(
+                      name.toUpperCase(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15.0.sp,
+                          color: Colors.black),
+                     overflow: TextOverflow.ellipsis,
+                    ),
+
                   const Spacer(),
                   InkWell(
                     onTap: () {
@@ -88,6 +90,7 @@ Widget customRequestCard({
                                   children: [
                                     Text(
                                       startTime,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                           fontSize: 13.0.sp,
                                           color: Colors.black),
@@ -97,6 +100,7 @@ Widget customRequestCard({
                                     ),
                                     Text(
                                       endTime,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                           fontSize: 13.0.sp,
                                           color: Colors.black),
@@ -131,14 +135,16 @@ Widget customRequestCard({
                                   width: 194.w,
                                   child: Column(
                                     children: [
-                                      Text(
-                                        maxLines: 2,
-                                        startTrip,
-                                        style: TextStyle(
-                                            fontSize: 15.0.sp,
-                                            color: Colors.black,
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
+                                    Text(
+                                          maxLines: 2,
+                                          startTrip,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                              fontSize: 14.0.sp,
+                                              color: Colors.black,
+                                              overflow: TextOverflow.ellipsis),
+                                        ),
+
                                       Text(
                                         maxLines: 2,
                                         endTrip,
@@ -160,7 +166,7 @@ Widget customRequestCard({
                                         ? "A trip without a known destination"
                                         : "رحلة بدون وجهة معروفة",
                                     style: TextStyle(
-                                        fontSize: 18.0.sp,
+                                        fontSize: 15.0.sp,
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -202,15 +208,16 @@ Widget customRequestCard({
                                       LocaleKeys.dinar.tr(),
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 18.0.sp,
+                                          fontSize: 15.0.sp,
                                           color: HexColor('#3E4958')),
                                     ),
                                     Text(
                                       cost,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                           height: 1,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 32.0.sp,
+                                          fontSize: 24.0.sp,
                                           color: HexColor('#3E4958')),
                                     ),
                                   ],

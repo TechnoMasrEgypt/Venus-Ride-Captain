@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CacheHelper {
@@ -37,6 +38,7 @@ class CacheHelper {
     if (key == "id") {
       print("ssssss" + sharedPreferences!.get(key).toString());
     }
+
     return sharedPreferences!.get(key);
   }
 

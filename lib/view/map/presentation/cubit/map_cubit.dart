@@ -41,9 +41,11 @@ class MapCubit extends Cubit<MapState> {
     emit(PolyLoaded());
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-      mapKey, // Your Google Map Key
-      PointLatLng(currentPosition.latitude, currentPosition.longitude),
-      PointLatLng(lat, lng),
+      request: PolylineRequest(
+        origin:  PointLatLng(currentPosition.latitude, currentPosition.longitude), // San Francisco
+        destination: PointLatLng(lat, lng), // San Jose
+        mode: TravelMode.driving,
+      ),
     );
     if (result.points.isNotEmpty) {
       for (var point in result.points) {

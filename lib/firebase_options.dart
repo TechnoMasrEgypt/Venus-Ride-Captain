@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBBrwYkFi0uyjLdSl5whTcbWjXQO9c_8kw',
-    appId: '1:1086435084834:android:6125bc96e71c34e4cdd87b',
+    appId: '1:1086435084834:android:11fc57730ff799a8cdd87b',
     messagingSenderId: '1086435084834',
     projectId: 'venus-captin',
     databaseURL: 'https://venus-captin-default-rtdb.firebaseio.com',
@@ -60,12 +60,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyA1aFIUh4b-UfKrlbm3_NReQ1QlTrMVz4c',
-    appId: '1:1086435084834:ios:b622bb3fa7c032c4cdd87b',
+    appId: '1:1086435084834:ios:62ea70b1a4414523cdd87b',
     messagingSenderId: '1086435084834',
     projectId: 'venus-captin',
     databaseURL: 'https://venus-captin-default-rtdb.firebaseio.com',
     storageBucket: 'venus-captin.appspot.com',
-    iosClientId: '1086435084834-7kmkh3jlipj838buj2qkkc49bfhbbl43.apps.googleusercontent.com',
-    iosBundleId: 'com.technomasr.venusridecaptin',
+    androidClientId: '1086435084834-j8vh5caa7us0q1ercitl5olso0d0p6o7.apps.googleusercontent.com',
+    iosBundleId: 'com.tech.venuscaptian',
   );
+
 }

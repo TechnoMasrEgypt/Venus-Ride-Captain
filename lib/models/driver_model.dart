@@ -34,23 +34,23 @@ class DriverModel {
 }
 
 class DriverData {
-  int id;
-  int user;
-  String name;
-  String userName;
-  String email;
-  String language;
-  String phone;
-  String avabile;
-  String identityCardNumber;
-  String license;
+  dynamic id;
+  dynamic user;
+  dynamic name;
+  dynamic userName;
+  dynamic email;
+  dynamic language;
+  dynamic phone;
+  dynamic avabile;
+  dynamic identityCardNumber;
+  dynamic license;
   dynamic deviceToken;
-  String photo;
-  String carType;
-  int carBoard;
+  dynamic photo;
+  dynamic carType;
+  dynamic carBoard;
   dynamic wallets;
-  int rides;
-  int rates;
+  dynamic rides;
+  dynamic rates;
   dynamic rating;
   dynamic lastWallet;
 

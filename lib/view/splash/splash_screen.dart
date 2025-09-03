@@ -30,7 +30,6 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-    FirebaseCrashlytics.instance.log('This is a log example');
     super.initState();
     _startDelay();
   }

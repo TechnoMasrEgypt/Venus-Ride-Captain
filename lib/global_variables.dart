@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:venus_driver/appStorage/local_cache_helper.dart';
+import 'package:venus_driver/widgets/asset_audio_player/src/assets_audio_player.dart';
 
 String mapKey = 'AIzaSyBaj8TdogqYDV8xOtl2HyJT7HO8m1IkcIE';
 String mapKeyWithBilling = 'AIzaSyBaj8TdogqYDV8xOtl2HyJT7HO8m1IkcIE';

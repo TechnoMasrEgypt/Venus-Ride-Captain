@@ -116,7 +116,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 fit: BoxFit.cover,
                                                 image: NetworkImage(
                                                   cubitDetails
-                                                      .driverData!.photo,
+                                                      .driverData == null ? "" :
+                                                  cubitDetails
+                                                      .driverData!.photo ,
                                                 )),
                                           ),
                                         ),
@@ -129,8 +131,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                cubitDetails.driverData!.name,
+                                              Text(cubitDetails.driverData == null ? "" :
+                                                cubitDetails.driverData!.name.toString(),
                                                 maxLines: 1,
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,
@@ -138,7 +140,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     overflow:
                                                         TextOverflow.ellipsis),
                                               ),
-                                              Text(
+                                              Text(cubitDetails
+                                                  .driverData == null ? "":
                                                 cubitDetails
                                                     .driverData!.carType,
                                                 maxLines: 1,
@@ -200,6 +203,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     .circular(
                                                                         8.r),
                                                             color: cubitDetails
+                                                                .driverData == null ?
+                                                                Colors.white :
+
+                                                            cubitDetails
                                                                         .driverData!
                                                                         .avabile ==
                                                                     'offline'
@@ -220,7 +227,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             ],
                                                           ),
                                                           child: Center(
-                                                              child: Text(
+                                                              child:
+                                                              Text( cubitDetails.driverData
+                                                                  == null ? "" :
                                                             cubitDetails.driverData!
                                                                         .avabile ==
                                                                     'offline'
@@ -360,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Text(
+                                                Text(cubitDetails.driverData == null ? "":
                                                   cubitDetails.driverData!.rides
                                                       .toString(),
                                                   style: TextStyle(
@@ -414,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               SizedBox(
                                                 width: 10.w,
                                               ),
-                                              Text(
+                                              Text(cubitDetails.driverData == null ? "" :
                                                 cubitDetails.driverData!.rating
                                                     .toStringAsFixed(1)
                                                     .toString(),
@@ -452,7 +461,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Text(
+                                                Text(cubitDetails.driverData == null ? "" :
                                                   cubitDetails.driverData!.rates
                                                       .toString(),
                                                   style: TextStyle(
@@ -481,7 +490,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   SizedBox(height: 40.h),
                                   circlularPercentIndicator(
                                       percent: .6,
-                                      wallets:
+                                      wallets:cubitDetails.driverData == null ? "" :
                                           (cubitDetails.driverData!.wallets /
                                                   100)
                                               .toStringAsFixed(2)
@@ -519,7 +528,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                               width: MediaQuery.of(context)
                                                   .size
                                                   .width,
-                                              child: cubitDetails.driverData!
+                                              child:cubitDetails.driverData == null ?
+                                              Lottie.asset(
+                                                  'assets/json/moving_car.json') :
+
+                                              cubitDetails.driverData!
                                                               .avabile ==
                                                           'online' &&
                                                       cubit.checkData != null

@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +16,8 @@ import 'package:venus_driver/view/home/presentation/screen/home_screen.dart';
 import 'package:venus_driver/view/map/presentation/screen/map_screen.dart';
 import 'package:venus_driver/widgets/custom_cancle_dialog.dart';
 import 'package:venus_driver/widgets/custom_snackbar.dart';
+
+import '../../../../widgets/asset_audio_player/src/playable.dart';
 
 part 'home_state.dart';
 

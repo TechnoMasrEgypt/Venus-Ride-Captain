@@ -147,7 +147,7 @@ class ProfileBody extends StatelessWidget {
                           SizedBox(
                             height: 12.h,
                           ),
-                          Text(
+                          Text(cubit.driverData == null ? "" :
                             cubit.driverData!.name,
                             style: TextStyle(
                                 fontSize: 20.sp, fontWeight: FontWeight.bold),
