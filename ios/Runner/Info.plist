@@ -41,7 +41,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
-	<true/>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>sms</string>
@@ -63,7 +63,12 @@
 	<array>
 		<string>fetch</string>
 		<string>remote-notification</string>
+		<string>processing</string>
+		<string>location</string>
+		<string>push-to-talk</string>
 	</array>
+	<key>GMSApiKey</key>
+	<string>AIzaSyA1aFIUh4b-UfKrlbm3_NReQ1QlTrMVz4c</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -85,5 +90,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+
+	<!-- ✅ REQUIRED FOR UIBackgroundModes: processing -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.venusdrive.backgroundTask</string>
+	</array>
 </dict>
 </plist>

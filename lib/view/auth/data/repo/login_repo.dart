@@ -16,12 +16,12 @@ class LoginRepo {
     final response = await DioHelper.post(DioString.login, body: {
       'email': email,
       'password': password,
-      'device_token': CacheHelper.getData(key: 'token'),
+      'device_token': CacheHelper.getData(key: 'token').toString(),
     }, headers: {
       'lang': CacheHelper.getData(key: 'lang'),
     });
     //log(CacheHelper.getData(key: 'token'));
-    print("device token is " + CacheHelper.getData(key: 'token'));
+    print("device token is " + CacheHelper.getData(key: 'token').toString());
     log(CacheHelper.getData(key: 'lang'));
     try {
       if (response.statusCode == 200 && response.data['status'] == 'success') {

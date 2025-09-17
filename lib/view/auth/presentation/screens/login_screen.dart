@@ -18,10 +18,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     CacheHelper.saveData(key: 'lang', value: 'en');
-    FirebaseMessaging.instance
-        .getToken()
-        .then((value) => CacheHelper.saveData(key: 'token', value: value))
-        .toString();
+    try{
+      FirebaseMessaging.instance
+          .getToken()
+          .then((value) => CacheHelper.saveData(key: 'token', value: value))
+          .toString();
+    }catch(e){
+
+    }
+
     super.initState();
   }
 

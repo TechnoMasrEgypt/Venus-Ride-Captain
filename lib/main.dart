@@ -42,6 +42,7 @@ void main() async {
     //   name: "VenusCaptin",
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  setupPushNotifications();
 
   await EasyLocalization.ensureInitialized();
   runZonedGuarded<Future<void>>(() async {
@@ -127,6 +128,36 @@ void main() async {
       child: DevicePreview(
           enabled: false,
           builder: (_)=>MyApp()) ));
+}
+Future<void> setupPushNotifications() async {
+
+
+  // 🔐 Ask for permission
+  NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    announcement: true,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+
+    // ⚠️ Wait a moment to let APNs token be registered
+    await Future.delayed(Duration(seconds: 1));
+
+    // 📬 Get the APNs token (iOS only)
+    String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    print('📬 APNs Token: $apnsToken');
+
+    // 📲 Now get FCM token
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
+    print('📲 FCM Token: $fcmToken');
+  } else {
+    print('❌ Permission denied');
+  }
 }
 
 class MyApp extends StatefulWidget {
