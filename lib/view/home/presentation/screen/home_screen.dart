@@ -10,9 +10,12 @@ import 'package:venus_driver/appStorage/local_cache_helper.dart';
 import 'package:venus_driver/global_variables.dart';
 import 'package:venus_driver/helpers/hex_color.dart';
 import 'package:venus_driver/router/router.dart';
+import 'package:venus_driver/services/location_service.dart';
 import 'package:venus_driver/translations/locale_keys.g.dart';
 import 'package:venus_driver/utils/brand_colors.dart';
 import 'package:venus_driver/view/home/presentation/cubit/home_cubit.dart';
+import 'package:venus_driver/view/map/presentation/screen/map_screen.dart';
+import 'package:venus_driver/view/map/presentation/screen/trip_screen.dart';
 import 'package:venus_driver/view/profile/presentation/cubit/profile_cubit.dart';
 import 'package:venus_driver/view/review/presentation/screen/review_Screen.dart';
 import 'package:venus_driver/view/ride_history/presentation/screen/ride_history_screen.dart';
@@ -40,16 +43,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-          providers: [
-            BlocProvider(
-                create: (context) => HomeCubit()
-                  ..getCurrentPosition()
-                  ..getRequest()
-                  ..sendToken()),
-            BlocProvider(
-              create: (context) => ProfileCubit()..getProfileDetails(),
-            ),
-          ],
+        providers: [
+          BlocProvider(create: (context) => HomeCubit()..initHome()),
+          BlocProvider(
+            create: (context) => ProfileCubit()..getProfileDetails(),
+          ),
+        ],
+        child: BlocListener<HomeCubit, HomeState>(
+          listener: (context, state) {
+            // No navigation from HomeScreen — SplashScreen handles routing on startup.
+          },
           child: Scaffold(
               drawer: CustomDrawer(
                 changeLang: (newValue) {
@@ -112,14 +115,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           decoration: BoxDecoration(
                                             color: Colors.white,
                                             shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image: NetworkImage(
-                                                  cubitDetails
-                                                      .driverData == null ? "" :
-                                                  cubitDetails
-                                                      .driverData!.photo ,
-                                                )),
+                                            // image: DecorationImage(
+                                            //     fit: BoxFit.cover,
+                                            //     image: NetworkImage(
+                                            //       cubitDetails.driverData == null
+                                            //           ? ""
+                                            //           : cubitDetails
+                                            //               .driverData!.photo,
+                                            //     )),
                                           ),
                                         ),
                                         SizedBox(width: 8.w),
@@ -131,8 +134,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(cubitDetails.driverData == null ? "" :
-                                                cubitDetails.driverData!.name.toString(),
+                                              Text(
+                                                cubitDetails.driverData == null
+                                                    ? ""
+                                                    : cubitDetails
+                                                        .driverData!.name
+                                                        .toString(),
                                                 maxLines: 1,
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,
@@ -140,10 +147,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     overflow:
                                                         TextOverflow.ellipsis),
                                               ),
-                                              Text(cubitDetails
-                                                  .driverData == null ? "":
-                                                cubitDetails
-                                                    .driverData!.carType,
+                                              Text(
+                                                cubitDetails.driverData == null
+                                                    ? ""
+                                                    : cubitDetails
+                                                        .driverData!.carType,
                                                 maxLines: 1,
                                                 style: TextStyle(
                                                     fontSize: 12.sp,
@@ -203,17 +211,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     .circular(
                                                                         8.r),
                                                             color: cubitDetails
-                                                                .driverData == null ?
-                                                                Colors.white :
-
-                                                            cubitDetails
-                                                                        .driverData!
-                                                                        .avabile ==
-                                                                    'offline'
-                                                                ? Colors
-                                                                    .red[400]
-                                                                : Colors
-                                                                    .green[400],
+                                                                        .driverData ==
+                                                                    null
+                                                                ? Colors.white
+                                                                : cubitDetails
+                                                                            .driverData!
+                                                                            .avabile ==
+                                                                        'offline'
+                                                                    ? Colors.red[
+                                                                        400]
+                                                                    : Colors.green[
+                                                                        400],
                                                             boxShadow: const [
                                                               BoxShadow(
                                                                 color: Color(
@@ -227,18 +235,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             ],
                                                           ),
                                                           child: Center(
-                                                              child:
-                                                              Text( cubitDetails.driverData
-                                                                  == null ? "" :
-                                                            cubitDetails.driverData!
-                                                                        .avabile ==
-                                                                    'offline'
-                                                                ? LocaleKeys
-                                                                    .offline
-                                                                    .tr()
-                                                                : LocaleKeys
-                                                                    .online
-                                                                    .tr(),
+                                                              child: Text(
+                                                            cubitDetails.driverData ==
+                                                                    null
+                                                                ? ""
+                                                                : cubitDetails
+                                                                            .driverData!
+                                                                            .avabile ==
+                                                                        'offline'
+                                                                    ? LocaleKeys
+                                                                        .offline
+                                                                        .tr()
+                                                                    : LocaleKeys
+                                                                        .online
+                                                                        .tr(),
                                                             style: TextStyle(
                                                                 fontSize: 18.sp,
                                                                 color: Colors
@@ -271,7 +281,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                             // log(cubitDetails.driverData!.photo);
                                             // log(CacheHelper.getData(
                                             //     key: 'token'));
-                                            log(currentPosition.toString());
+                                            log(LocationService
+                                                    .instance.currentPosition
+                                                    ?.toString() ??
+                                                'position not available');
                                           },
                                           child: Container(
                                               height: 36.w,
@@ -369,9 +382,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Text(cubitDetails.driverData == null ? "":
-                                                  cubitDetails.driverData!.rides
-                                                      .toString(),
+                                                Text(
+                                                  cubitDetails.driverData ==
+                                                          null
+                                                      ? ""
+                                                      : cubitDetails
+                                                          .driverData!.rides
+                                                          .toString(),
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -423,10 +440,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                               SizedBox(
                                                 width: 10.w,
                                               ),
-                                              Text(cubitDetails.driverData == null ? "" :
-                                                cubitDetails.driverData!.rating
-                                                    .toStringAsFixed(1)
-                                                    .toString(),
+                                              Text(
+                                                cubitDetails.driverData == null
+                                                    ? ""
+                                                    : cubitDetails
+                                                        .driverData!.rating
+                                                        .toStringAsFixed(1)
+                                                        .toString(),
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 17.0.sp,
@@ -461,9 +481,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Text(cubitDetails.driverData == null ? "" :
-                                                  cubitDetails.driverData!.rates
-                                                      .toString(),
+                                                Text(
+                                                  cubitDetails.driverData ==
+                                                          null
+                                                      ? ""
+                                                      : cubitDetails
+                                                          .driverData!.rates
+                                                          .toString(),
                                                   style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -490,8 +514,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   SizedBox(height: 40.h),
                                   circlularPercentIndicator(
                                       percent: .6,
-                                      wallets:cubitDetails.driverData == null ? "" :
-                                          (cubitDetails.driverData!.wallets /
+                                      wallets: cubitDetails.driverData == null
+                                          ? ""
+                                          : (cubitDetails.driverData!.wallets /
                                                   100)
                                               .toStringAsFixed(2)
                                               .toString()),
@@ -528,52 +553,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                               width: MediaQuery.of(context)
                                                   .size
                                                   .width,
-                                              child:cubitDetails.driverData == null ?
-                                              Lottie.asset(
-                                                  'assets/json/moving_car.json') :
-
-                                              cubitDetails.driverData!
-                                                              .avabile ==
-                                                          'online' &&
-                                                      cubit.checkData != null
-                                                  ? customRequestCard(
-                                                      context: context,
-                                                      cost: cubit
-                                                          .tripDetails!.cost,
-                                                      endTime: cubit
-                                                          .tripDetails!.endTime,
-                                                      endTrip: cubit
-                                                          .tripDetails!.endTrip,
-                                                      name: cubit.tripDetails!
-                                                          .clientName,
-                                                      startTime: cubit
-                                                          .tripDetails!
-                                                          .startTime,
-                                                      startTrip: cubit
-                                                          .tripDetails!
-                                                          .startTrip,
-                                                      image: cubit
-                                                          .tripDetails!.photo,
-                                                      onTap: () async {
-                                                        await cubit
-                                                            .acceptDriverRide(
+                                              child: cubitDetails.driverData ==
+                                                      null
+                                                  ? Lottie.asset(
+                                                      'assets/json/moving_car.json')
+                                                  : cubitDetails.driverData!.avabile ==
+                                                              'online' &&
+                                                          cubit.checkData !=
+                                                              null
+                                                      ? customRequestCard(
+                                                          context: context,
+                                                          cost: cubit
+                                                              .tripDetails!
+                                                              .cost,
+                                                          endTime: cubit
+                                                              .tripDetails!
+                                                              .endTime,
+                                                          endTrip: cubit
+                                                              .tripDetails!
+                                                              .endTrip,
+                                                          name: cubit
+                                                              .tripDetails!
+                                                              .clientName,
+                                                          startTime: cubit
+                                                              .tripDetails!
+                                                              .startTime,
+                                                          startTrip: cubit
+                                                              .tripDetails!
+                                                              .startTrip,
+                                                          image: cubit
+                                                              .tripDetails!
+                                                              .photo,
+                                                          onTap: () async {
+                                                            await cubit.acceptDriverRide(
                                                                 context:
                                                                     context,
                                                                 driverId:
                                                                     cubitDetails
                                                                         .driverData!
                                                                         .id);
-                                                        await refRequset
-                                                            .remove();
-                                                      },
-                                                      statusRide: cubit
-                                                                  .tripDetails!
-                                                                  .rideType ==
-                                                              "not_directed"
-                                                          ? true
-                                                          : false)
-                                                  : Lottie.asset(
-                                                      'assets/json/moving_car.json'),
+                                                            await refRequset
+                                                                .remove();
+                                                          },
+                                                          statusRide:
+                                                              cubit.tripDetails!.rideType ==
+                                                                      "not_directed"
+                                                                  ? true
+                                                                  : false)
+                                                      : Lottie.asset('assets/json/moving_car.json'),
                                             );
                                     },
                                   )
@@ -582,7 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           )),
                 );
-              })))
-    ;
+              })),
+        ));
   }
 }

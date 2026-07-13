@@ -11,6 +11,7 @@ import 'package:venus_driver/global_variables.dart';
 import 'package:venus_driver/helpers/helper_methods.dart';
 import 'package:venus_driver/helpers/hex_color.dart';
 import 'package:venus_driver/router/router.dart';
+import 'package:venus_driver/services/location_service.dart';
 import 'package:venus_driver/translations/locale_keys.g.dart';
 import 'package:venus_driver/utils/brand_colors.dart';
 import 'package:venus_driver/view/chat/presentations/views/chat_view.dart';
@@ -23,8 +24,10 @@ import 'package:venus_driver/widgets/custom_drawer.dart';
 import 'package:venus_driver/widgets/custom_icon_back.dart';
 
 class TripScreen extends StatefulWidget {
-  const TripScreen({required this.tripDetails, super.key});
+  const TripScreen(
+      {required this.tripDetails, this.isOngoing = false, super.key});
   final TripDetails? tripDetails;
+  final bool isOngoing;
 
   @override
   State<TripScreen> createState() => _TripScreenState();
@@ -37,6 +40,8 @@ class _TripScreenState extends State<TripScreen> {
   @override
   void initState() {
     super.initState();
+    startTrip = widget.isOngoing; // ← set from outside
+
     HelperMethods.disableLocationUpdates();
     DefaultAssetBundle.of(context)
         .loadString('assets/style/silver_theme.json')
@@ -48,11 +53,23 @@ class _TripScreenState extends State<TripScreen> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => MapCubit()
-            ..setCustomMarker()
-            ..getPolyPoints(double.parse(widget.tripDetails!.distanceLat),
-                double.parse(widget.tripDetails!.distanceLng))
-            ..getCurrentPositionUpdate(),
+          create: (context) {
+            final cubit = MapCubit()
+              ..setCustomMarker()
+              ..getPolyPoints(double.parse(widget.tripDetails!.distanceLat),
+                  double.parse(widget.tripDetails!.distanceLng))
+              ..getCurrentPositionUpdate();
+
+            // ✅ safe here — cubit is already created
+            if (widget.isOngoing) {
+              cubit.startRealTimeDirectionUpdates(LatLng(
+                double.parse(widget.tripDetails!.distanceLat),
+                double.parse(widget.tripDetails!.distanceLng),
+              ));
+            }
+
+            return cubit;
+          },
         ),
         BlocProvider(
             create: (context) => ChatCubit()
@@ -138,8 +155,14 @@ class _TripScreenState extends State<TripScreen> {
                             padding: EdgeInsets.symmetric(horizontal: 10.h),
                             initialCameraPosition: CameraPosition(
                               zoom: 13.5,
-                              target: LatLng(currentPosition.latitude,
-                                  currentPosition.longitude),
+                              target: LatLng(
+                                LocationService
+                                        .instance.currentPosition?.latitude ??
+                                    googlePlex.target.latitude,
+                                LocationService
+                                        .instance.currentPosition?.longitude ??
+                                    googlePlex.target.longitude,
+                              ),
                             ),
                             myLocationEnabled: false,
                             polylines: {
@@ -152,11 +175,19 @@ class _TripScreenState extends State<TripScreen> {
                             },
                             markers: {
                               Marker(
-                                rotation: currentPosition.heading,
+                                rotation: LocationService
+                                        .instance.currentPosition?.heading ??
+                                    0,
                                 markerId: const MarkerId("CurrentPosition"),
                                 icon: cubit.currentLocationIcon,
-                                position: LatLng(currentPosition.latitude,
-                                    currentPosition.longitude),
+                                position: LatLng(
+                                  LocationService
+                                          .instance.currentPosition?.latitude ??
+                                      googlePlex.target.latitude,
+                                  LocationService.instance.currentPosition
+                                          ?.longitude ??
+                                      googlePlex.target.longitude,
+                                ),
                               ),
                               Marker(
                                 markerId: const MarkerId("destination"),
@@ -376,10 +407,19 @@ class _TripScreenState extends State<TripScreen> {
                                                   } else {
                                                     cubit.getDirectionDetails(
                                                         endPosition: LatLng(
-                                                            currentPosition
-                                                                .latitude,
-                                                            currentPosition
-                                                                .longitude),
+                                                          LocationService
+                                                                  .instance
+                                                                  .currentPosition
+                                                                  ?.latitude ??
+                                                              googlePlex.target
+                                                                  .latitude,
+                                                          LocationService
+                                                                  .instance
+                                                                  .currentPosition
+                                                                  ?.longitude ??
+                                                              googlePlex.target
+                                                                  .longitude,
+                                                        ),
                                                         rideID: widget
                                                             .tripDetails!.ride,
                                                         startPosition: LatLng(

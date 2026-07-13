@@ -26,3 +26,8 @@ class LocationLoading extends HomeState {}
 class Offline extends HomeState {}
 
 class Online extends HomeState {}
+class UpdateLocationSuccess extends HomeState {}
+class UpdateLocationFailed extends HomeState {}
+ 
+class CheckOngoingRideLoading extends HomeState {}
+class CheckOngoingRideNone extends HomeState {}

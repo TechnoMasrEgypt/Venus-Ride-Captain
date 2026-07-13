@@ -2,7 +2,7 @@ name: venus_driver
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.1.0
 
 environment:
-  sdk: '>=2.19.4 <3.0.0'
+  sdk: ">=2.19.4 <3.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -31,14 +31,12 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  connectivity_plus: ^6.1.4
   google_maps_flutter: ^2.1.5
   geolocator: ^11.1.0
-  syncfusion_flutter_gauges: ^27.2.4
+  syncfusion_flutter_gauges: ^28.2.12
   flutter_screenutil: ^5.9.3
   flutter_svg: ^2.0.5
   dio: ^5.0.3
@@ -48,7 +46,7 @@ dependencies:
   shared_preferences: ^2.0.20
   flutter_bloc: ^8.1.2
   equatable: ^2.0.5
-  firebase_core: 
+  firebase_core:
   #gradient_widgets_plus: ^1.0.0
   flutter_polyline_points: ^2.1.0
   font_awesome_flutter: ^10.1.0
@@ -65,7 +63,7 @@ dependencies:
   percent_indicator: ^4.2.3
   firebase_messaging: ^16.0.0
   html: ^0.15.2
-  intl: 
+  intl:
   sliding_up_panel: ^2.0.0+1
   path_provider: ^2.1.5
   rxdart: ^0.28.0
@@ -73,9 +71,10 @@ dependencies:
   firebase_database:
   firebase_analytics: ^12.0.0
   ##cloud_firestore: ^4.1.0
-  wakelock_plus: 
-  flutter_launcher_icons: 
-  firebase_crashlytics: 
+  audioplayers: ^6.1.0
+  wakelock_plus:
+  flutter_launcher_icons:
+  firebase_crashlytics:
   #app_activity_launcher: ^0.0.2
   #gradient_ui: ^1.1.0
 
@@ -86,7 +85,7 @@ flutter_icons:
   android: true
   ios: true
   image_path: "assets/images/logo.png"
-  min_sdk_android: 21       
+  min_sdk_android: 21
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -100,7 +99,6 @@ flutter_icons:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

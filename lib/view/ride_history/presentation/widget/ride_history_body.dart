@@ -59,6 +59,8 @@ class RideHistoryBody extends StatelessWidget {
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return customRideHistoryCard(
+                                        time: cubit
+                                            .listOfRideHistoryData[index].time,
                                         context: context,
                                         cost: cubit.listOfRideHistoryData[index].costRide
                                             .toString(),

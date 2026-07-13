@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../global_variables.dart';
+import '../services/location_service.dart';
 import '../widgets/ProgressDialog.dart';
 
 class HelperMethods {
   static void disableLocationUpdates() {
-    positionStream.pause();
+    LocationService.instance.pauseTracking();
   }
 
   static void cancleLocationUpdates() {
-    positionStream.cancel();
+    LocationService.instance.stopTracking();
   }
 
   static void enableLocationUpdates() {
-    positionStream.resume();
+    LocationService.instance.resumeTracking();
   }
 
   static void showProgressDialog(context) {

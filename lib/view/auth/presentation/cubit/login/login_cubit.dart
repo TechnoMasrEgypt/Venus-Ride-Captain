@@ -50,6 +50,7 @@ class LoginCubit extends Cubit<LoginState> {
       (res) async {
         emit(LoginInitial());
         await CacheHelper.saveData(key: 'id', value: res.data.id);
+        print("hossam"+ res.data.id.toString());
         await CacheHelper.saveData(key: 'user', value: res.data.user);
         await CacheHelper.saveData(key: 'name', value: res.data.name);
         await CacheHelper.saveData(key: 'photo', value: res.data.photo);

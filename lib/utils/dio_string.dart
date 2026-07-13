@@ -2,10 +2,13 @@ class DioString {
   //------------------------------------------------------------------------//
   static const String baseUrl = 'https://venus-ride.co/api/';
   //------------------------------------------------------------------------//
+  static const String getHistoryRideDetails = 'rides/history/ride';
 
   static const String profile = 'driver/profile';
   static const String updateProfile = 'driver/update';
+  static const String updatelocation = 'driver/updateLocation';
   static const String login = 'driver/login';
+  static const String settings = 'settings';
   static const String faqs = 'settings/faqs';
   static const String contactUS = 'settings/contact/pages';
   static const String privacy = 'settings/static/pages';
@@ -22,5 +25,7 @@ class DioString {
   static const String cancelledRide = 'rides/cancelled/ride';
   static const String acceptDriverRide = 'rides/accept/driver';
   static const String sentToken = 'createNewToken';
-  static const String sendMessage = 'rides/chat/ride';
+  static const String sendMessage = 'rides/chat/ride';  
+  static const String checkOngoingRide  = 'rides/OngoingRide';
+
 }

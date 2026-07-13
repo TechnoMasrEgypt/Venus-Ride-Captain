@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:venus_driver/appStorage/local_cache_helper.dart';
 import 'package:venus_driver/global_variables.dart';
 import 'package:venus_driver/models/driver_model.dart';
+import 'package:venus_driver/services/location_service.dart';
 import 'package:venus_driver/view/profile/data/profile_repo.dart';
 import 'package:venus_driver/widgets/custom_snackbar.dart';
 
@@ -57,11 +58,13 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   Future goOnline() async {
     await driverStatus('1');
+    await LocationService.instance.startTracking();
   }
 
   Future goOffline() async {
     await driverStatus('0');
     await assetsAudioPlayer.stop();
+    await LocationService.instance.stopTracking();
   }
 
   Future editImageProfile() async {

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,18 +13,17 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:venus_driver/appStorage/local_cache_helper.dart';
 import 'package:venus_driver/bloc_observer.dart';
-import 'package:venus_driver/view/auth/presentation/screens/login_screen.dart';
-import 'package:venus_driver/view/home/presentation/screen/home_screen.dart';
-import 'package:venus_driver/widgets/error_internet_screen.dart';
 import 'package:venus_driver/firebase_options.dart';
 import 'package:venus_driver/global_variables.dart';
-import 'package:venus_driver/helpers/netwok_info.dart';
 import 'package:venus_driver/router/router.dart';
+import 'package:venus_driver/services/location_service.dart';
 import 'package:venus_driver/translations/codegen_loader.g.dart';
 import 'package:venus_driver/view/splash/splash_screen.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 //import 'package:external_app_launcher/external_app_launcher.dart';
+@pragma('vm:entry-point')
+
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
@@ -55,20 +53,20 @@ void main() async {
   WakelockPlus.enable();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-    providesAppNotificationSettings: true
-  );
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+      providesAppNotificationSettings: true);
 
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel', // id
     'High Importance Notifications', // title
     // description
+    sound:RawResourceAndroidNotificationSound('notification_sound') ,
     importance: Importance.max,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -101,22 +99,28 @@ void main() async {
     RemoteNotification? notification = message.notification;
     //RemoteNotification? android = message.notification!;
 
-    if (notification != null ) {
+    if (notification != null) {
       flutterLocalNotificationsPlugin.show(
           notification.hashCode,
           notification.title,
           notification.body,
           const NotificationDetails(
             android: AndroidNotificationDetails(
-              'channel id',
+              'high_importance_channel',
               'channel name',
               channelDescription: 'channel description',
+              sound: RawResourceAndroidNotificationSound('notification_sound') ,
               priority: Priority.high,
               importance: Importance.high,
               fullScreenIntent: true,
               icon: '@mipmap/ic_launcher',
             ),
-            iOS: DarwinNotificationDetails(),
+            iOS: DarwinNotificationDetails(
+              sound: 'notification_sound.caf',
+              presentAlert: true,
+              presentSound: true,
+              presentBadge: true,
+            ),
           ));
     }
   });
@@ -125,15 +129,13 @@ void main() async {
       assetLoader: const CodegenLoader(),
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      child: DevicePreview(
-          enabled: false,
-          builder: (_)=>MyApp()) ));
+      child: DevicePreview(enabled: false, builder: (_) => MyApp())));
 }
+
 Future<void> setupPushNotifications() async {
-
-
   // 🔐 Ask for permission
-  NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+  NotificationSettings settings =
+      await FirebaseMessaging.instance.requestPermission(
     alert: true,
     announcement: true,
     badge: true,
@@ -144,7 +146,6 @@ Future<void> setupPushNotifications() async {
   );
 
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-
     // ⚠️ Wait a moment to let APNs token be registered
     await Future.delayed(Duration(seconds: 1));
 
@@ -168,36 +169,33 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  Map _source = {ConnectivityResult.none: false};
-  void _checkInternet() {
-    NetworkConnectivity.instance.initialise();
-    NetworkConnectivity.instance.myStream.listen((source) {
-      _source = source;
-      log('source $_source');
-      switch (_source.keys.toList()[0]) {
-        case ConnectivityResult.mobile:
-          _source.values.toList()[0]
-              ? log('Network Connection')
-              : MagicRouter.navigateTo(const ErrorScreen());
-          break;
-        case ConnectivityResult.wifi:
-          _source.values.toList()[0]
-              ? log('Network Connection')
-              : MagicRouter.navigateTo(const ErrorScreen());
-          break;
-        case ConnectivityResult.none:
-        default:
-          MagicRouter.navigateTo(const ErrorScreen());
-      }
-      setState(() {});
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    _checkInternet();
-    // setupInteractedMessage();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        // App went to background — pause GPS to save battery.
+        LocationService.instance.pauseTracking();
+        break;
+      case AppLifecycleState.resumed:
+        // App returned to foreground — resume GPS.
+        LocationService.instance.resumeTracking();
+        break;
+      default:
+        break;
+    }
   }
 
   // Future<void> setupInteractedMessage() async {

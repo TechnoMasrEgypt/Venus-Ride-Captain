@@ -36,7 +36,7 @@ class CacheHelper {
   //get all data type from cache
   static dynamic getData({required String key}) {
     if (key == "id") {
-      print("ssssss" + sharedPreferences!.get(key).toString());
+      print("userId:" + sharedPreferences!.get(key).toString());
     }
 
     return sharedPreferences!.get(key);

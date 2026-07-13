@@ -14,6 +14,7 @@ import 'package:venus_driver/dataModels/trip_details.dart';
 import 'package:venus_driver/global_variables.dart';
 import 'package:venus_driver/helpers/helper_methods.dart';
 import 'package:venus_driver/router/router.dart';
+import 'package:venus_driver/services/location_service.dart';
 import 'package:venus_driver/translations/locale_keys.g.dart';
 import 'package:venus_driver/utils/brand_colors.dart';
 import 'package:venus_driver/helpers/hex_color.dart';
@@ -76,6 +77,15 @@ class _MapScreenState extends State<MapScreen> {
               ..getAllMessages(rideId: int.parse(widget.tripDetails!.ride))),
       ],
       child: BlocBuilder<MapCubit, MapState>(
+        buildWhen: (p, c) =>
+            c is LocationUpdated ||
+            c is DirectionUpdated ||
+            c is PolyLoading ||
+            c is PolyLoaded ||
+            c is MapInitial ||
+            c is MapLoading ||
+            c is CancleLoaded ||
+            c is CancleLoading,
         builder: (context, state) {
           final cubit = MapCubit.of(context);
           return Scaffold(
@@ -142,8 +152,10 @@ class _MapScreenState extends State<MapScreen> {
                           padding: EdgeInsets.only(bottom: 125.h),
                           initialCameraPosition: CameraPosition(
                             zoom: 13.5,
-                            target: LatLng(currentPosition.latitude,
-                                currentPosition.longitude),
+                            target: LatLng(
+                              LocationService.instance.currentPosition?.latitude ?? googlePlex.target.latitude,
+                              LocationService.instance.currentPosition?.longitude ?? googlePlex.target.longitude,
+                            ),
                           ),
                           myLocationEnabled: false,
                           polylines: {
@@ -156,11 +168,13 @@ class _MapScreenState extends State<MapScreen> {
                           },
                           markers: {
                             Marker(
-                              rotation: currentPosition.heading,
+                              rotation: LocationService.instance.currentPosition?.heading ?? 0,
                               markerId: const MarkerId("CurrentPosition"),
                               icon: cubit.currentLocationIcon,
-                              position: LatLng(currentPosition.latitude,
-                                  currentPosition.longitude),
+                              position: LatLng(
+                                LocationService.instance.currentPosition?.latitude ?? googlePlex.target.latitude,
+                                LocationService.instance.currentPosition?.longitude ?? googlePlex.target.longitude,
+                              ),
                             ),
                             Marker(
                               markerId: const MarkerId("destination"),

@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  connectivity_plus
+  audioplayers_windows
   file_selector_windows
   firebase_auth
   firebase_core

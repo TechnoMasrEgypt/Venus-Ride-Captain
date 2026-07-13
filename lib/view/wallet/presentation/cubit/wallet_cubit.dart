@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:venus_driver/view/wallet/data/model/wallet_model.dart';
@@ -20,6 +22,7 @@ class WalletCubit extends Cubit<WalletState> {
     res.fold(
       (err) {
         showSnackBar(err);
+        log("Error : $err");
         emit(WalletInitial());
       },
       (res) async {

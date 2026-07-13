@@ -26,3 +26,16 @@ class LocationLoading extends MapState {}
 class CancleLoaded extends MapState {}
 
 class CancleLoading extends MapState {}
+ 
+// ─── [NEW] LocationUpdated ───────────────────────────────────────────────────
+// Emitted on every position stream tick so the map redraws the captain marker.
+class LocationUpdated extends MapState {}
+ 
+// ─── [NEW] DirectionUpdated ──────────────────────────────────────────────────
+// Emitted every 10 seconds with fresh distance and ETA for the info card.
+class DirectionUpdated extends MapState {
+  final String distance; // e.g. "1.2 km"
+  final String duration; // e.g. "4 mins"
+  DirectionUpdated({required this.distance, required this.duration});
+}
+ 

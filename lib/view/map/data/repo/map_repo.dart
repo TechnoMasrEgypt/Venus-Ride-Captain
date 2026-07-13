@@ -43,6 +43,7 @@ class MapRepo {
     try {
       if (response.statusCode == 200 && response.data['status'] == 'success') {
         log("Success rideWay");
+
         return Right(SuccessModel.fromJson(jsonDecode(response.toString())));
       } else {
         return Left(ErrorModel.fromJson(jsonDecode(response.toString()))
@@ -68,9 +69,13 @@ class MapRepo {
       'startLocation': startAddress,
       'km': km,
     });
-    log(rideID);
-    log(km.toString());
     log(DateFormat.Hm('en_US').format(DateTime.now()).substring(0, 5));
+    log(startAddress.toString());
+    log(endAddress.toString());
+    log(rideID);
+    log("km " + km.toString());
+    log("time " +
+        DateFormat.Hm('en_US').format(DateTime.now()).substring(0, 5));
     try {
       if (response.statusCode == 200) {
         log("Success rideDone");

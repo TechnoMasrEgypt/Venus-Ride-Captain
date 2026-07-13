@@ -1,12 +1,10 @@
-import 'dart:async';
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:venus_driver/appStorage/local_cache_helper.dart';
-import 'package:venus_driver/widgets/asset_audio_player/src/assets_audio_player.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 String mapKey = 'AIzaSyBaj8TdogqYDV8xOtl2HyJT7HO8m1IkcIE';
 String mapKeyWithBilling = 'AIzaSyBaj8TdogqYDV8xOtl2HyJT7HO8m1IkcIE';
@@ -16,7 +14,7 @@ const CameraPosition googlePlex = CameraPosition(
   target: LatLng(31.0274113, 31.3732026),
   zoom: 14.4746,
 );
-late StreamSubscription<Position> positionStream;
+
 DatabaseReference refDriversInfo = FirebaseDatabase.instance
     .ref("Drivers/${CacheHelper.getData(key: 'id').toString()}");
 DatabaseReference refRequset = FirebaseDatabase.instance
@@ -25,8 +23,8 @@ DatabaseReference refReceiptRide = FirebaseDatabase.instance
     .ref("ReceiptRide/${CacheHelper.getData(key: 'id').toString()}");
 DatabaseReference refCancleRide = FirebaseDatabase.instance
     .ref("cancleDriverRides/${CacheHelper.getData(key: 'id').toString()}");
-final assetsAudioPlayer = AssetsAudioPlayer();
-late Position currentPosition;
+final assetsAudioPlayer = AudioPlayer();
+
 FirebaseAuth auth = FirebaseAuth.instance;
 Country selectedCountry = Country(
     phoneCode: '20',

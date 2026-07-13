@@ -14,9 +14,10 @@ Widget customRideHistoryCard({
   required String startRide,
   required String endRide,
   required String cost,
+  required String time,
 }) {
   return Container(
-    height: 232.h,
+    height: 250.h,
     width: 293.w,
     decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15.r),
@@ -24,6 +25,7 @@ Widget customRideHistoryCard({
     child: Padding(
       padding: EdgeInsets.all(10.0.w),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -117,6 +119,26 @@ Widget customRideHistoryCard({
           ),
           const Divider(
             thickness: 1,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(
+                '${LocaleKeys.time.tr()} : ',
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '$time ${LocaleKeys.minutes.tr()}',
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  color: BrandColors.colorPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,

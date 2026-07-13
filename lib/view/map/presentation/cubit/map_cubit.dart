@@ -14,6 +14,7 @@ import 'package:venus_driver/global_variables.dart';
 import 'package:venus_driver/helpers/helper_methods.dart';
 import 'package:venus_driver/helpers/request_helper.dart';
 import 'package:venus_driver/router/router.dart';
+import 'package:venus_driver/services/location_service.dart';
 import 'package:venus_driver/translations/locale_keys.g.dart';
 import 'package:venus_driver/view/home/presentation/screen/home_screen.dart';
 import 'package:venus_driver/view/map/data/repo/map_repo.dart';
@@ -21,6 +22,7 @@ import 'package:venus_driver/view/map/presentation/screen/trip_screen.dart';
 import 'package:venus_driver/view/receipt/presentation/screen/receipt_screen.dart';
 import 'package:venus_driver/widgets/custom_cancle_dialog.dart';
 import 'package:venus_driver/widgets/custom_snackbar.dart';
+import 'package:audioplayers/audioplayers.dart';
 part 'map_state.dart';
 
 class MapCubit extends Cubit<MapState> {
@@ -37,13 +39,20 @@ class MapCubit extends Cubit<MapState> {
   BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
 
+  Timer? _directionUpdateTimer; // periodic ETA/distance refresh
+  String currentDistance = ''; // shown on map info card
+  String currentDuration = ''; // shown on map info card
+  LatLng? _destinationLatLng; // cached destination for periodic updates
+
   void getPolyPoints(lat, lng) async {
     emit(PolyLoaded());
+    final pos = LocationService.instance.currentPosition;
+    if (pos == null) return;
     PolylinePoints polylinePoints = PolylinePoints();
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       request: PolylineRequest(
-        origin:  PointLatLng(currentPosition.latitude, currentPosition.longitude), // San Francisco
-        destination: PointLatLng(lat, lng), // San Jose
+        origin: PointLatLng(pos.latitude, pos.longitude),
+        destination: PointLatLng(lat, lng),
         mode: TravelMode.driving,
       ),
     );
@@ -59,22 +68,99 @@ class MapCubit extends Cubit<MapState> {
 
   void getCurrentPositionUpdate() async {
     emit(LocationInitial());
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation);
-    currentPosition = position;
-    GoogleMapController googleMapController = await controller.future;
-    LocationSettings settings = const LocationSettings(
-        accuracy: LocationAccuracy.bestForNavigation, distanceFilter: 4);
-    positionStream = Geolocator.getPositionStream(locationSettings: settings)
-        .listen((Position newposition) {
-      emit(LocationLoaded());
-      currentPosition = newposition;
+    // Ensure LocationService is tracking (may already be running from HomeScreen).
+    await LocationService.instance.startTracking();
+
+    final GoogleMapController googleMapController = await controller.future;
+
+    // Listen to Geolocator stream directly for map camera animations.
+    // LocationService handles the GPS stream; here we just subscribe for UI.
+    Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        distanceFilter: 4,
+      ),
+    ).listen((Position newPosition) async {
       googleMapController.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(
-              zoom: 17.5,
-              target: LatLng(newposition.latitude, newposition.longitude))));
-      emit(LocationLoading());
+        CameraPosition(
+          zoom: 17.5,
+          target: LatLng(newPosition.latitude, newPosition.longitude),
+        ),
+      ));
+      emit(LocationUpdated());
     });
+  }
+
+  void startRealTimeDirectionUpdates(LatLng destination) {
+    _destinationLatLng = destination;
+    _directionUpdateTimer?.cancel();
+    _directionUpdateTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      _updateDirectionInfo();
+    });
+  }
+
+  void stopRealTimeDirectionUpdates() {
+    _directionUpdateTimer?.cancel();
+    _directionUpdateTimer = null;
+  }
+
+  Future<void> _updateDirectionInfo() async {
+    if (_destinationLatLng == null) return;
+    final pos = LocationService.instance.currentPosition;
+    if (pos == null) return;
+
+    final String url = 'https://maps.googleapis.com/maps/api/directions/json'
+        '?origin=${pos.latitude},${pos.longitude}'
+        '&destination=${_destinationLatLng!.latitude},${_destinationLatLng!.longitude}'
+        '&mode=driving&key=$mapKeyWithBilling';
+
+    try {
+      final response = await RequestHelper.getRequest(url);
+      if (response == 'failed' || response['status'] != 'OK') return;
+
+      final leg = response['routes'][0]['legs'][0];
+      currentDistance = leg['distance']['text']; // e.g. "1.2 km"
+      currentDuration = leg['duration']['text']; // e.g. "4 mins"
+
+      // Refresh polyline with latest route
+      final String encoded =
+          response['routes'][0]['overview_polyline']['points'];
+      polylineCoordinates = _decodePolyline(encoded);
+
+      emit(DirectionUpdated(
+          distance: currentDistance, duration: currentDuration));
+    } catch (e) {
+      log('Direction update error: $e');
+    }
+  }
+
+  List<LatLng> _decodePolyline(String encoded) {
+    List<LatLng> points = [];
+    int index = 0;
+    final int len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int shift = 0, result = 0, b;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      lat += (result & 1) != 0 ? ~(result >> 1) : result >> 1;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      lng += (result & 1) != 0 ? ~(result >> 1) : result >> 1;
+
+      points.add(LatLng(lat / 1e5, lng / 1e5));
+    }
+    return points;
   }
 
   void setCustomMarker() {
@@ -90,7 +176,28 @@ class MapCubit extends Cubit<MapState> {
     });
   }
 
-  Future pickUPRide(tripDetails, rideId) async {
+  Future<void> notifyTripStarted(String clientUserId) async {
+    await FirebaseDatabase.instance
+        .ref("AcceptRide/$clientUserId")
+        .update({'status': 'intheway'});
+  }
+
+  Future<void> notifyDriverArrived(String clientUserId) async {
+    await FirebaseDatabase.instance
+        .ref("Arrived/$clientUserId")
+        .set({'arrived': true});
+  }
+
+  Future<void> notifyClientCancelled(String clientUserId) async {
+    await FirebaseDatabase.instance
+        .ref("cancleRides/$clientUserId")
+        .set({'cancelled': true});
+  }
+
+  Future pickUPRide(
+    tripDetails,
+    rideId,
+  ) async {
     emit(MapLoading());
     final res = await mapRepo.pickUPRide(rideId);
     res.fold(
@@ -101,8 +208,13 @@ class MapCubit extends Cubit<MapState> {
       (res) async {
         await showSnackBar(res.message.toString());
         emit(MapInitial());
+        await notifyDriverArrived(rideId);
+
         log(res.message.toString());
-        MagicRouter.navigateTo(TripScreen(tripDetails: tripDetails));
+        MagicRouter.navigateTo(TripScreen(
+          tripDetails: tripDetails,
+          isOngoing: false,
+        ));
       },
     );
     panelController.open();
@@ -123,6 +235,13 @@ class MapCubit extends Cubit<MapState> {
       (res) async {
         await showSnackBar(res.message.toString());
         log(res.message.toString());
+        await notifyTripStarted(rideId);
+        await notifyTripStarted(rideId);
+        final destination = LatLng(
+          double.parse(tripDetails.distanceLat),
+          double.parse(tripDetails.distanceLng),
+        );
+        startRealTimeDirectionUpdates(destination);
         emit(MapInitial());
       },
     );
@@ -142,18 +261,21 @@ class MapCubit extends Cubit<MapState> {
     res.fold(
       (err) async {
         await showSnackBar('Error');
-        log(err);
+        log("dasdsaddsadsaddad $err");
         emit(MapInitial());
       },
       (res) async {
         await showSnackBar(res.message.toString());
         emit(MapInitial());
+        stopRealTimeDirectionUpdates();
         MagicRouter.navigateTo(const ReceiptScreen());
       },
     );
   }
 
-  Future cancelledRide(rideId) async {
+  Future cancelledRide(
+    rideId,
+  ) async {
     emit(MapLoading());
     final res = await mapRepo.cancelledRide(rideId);
     res.fold(
@@ -163,13 +285,15 @@ class MapCubit extends Cubit<MapState> {
       },
       (res) async {
         emit(MapInitial());
+        stopRealTimeDirectionUpdates();
+        await notifyClientCancelled(rideId);
         MagicRouter.navigateTo(const HomeScreen());
       },
     );
   }
 
   Future cancleRideFireBase(context) async {
-    refCancleRide.onValue.listen((DatabaseEvent event) {
+    refCancleRide.onValue.listen((DatabaseEvent event) async {
       emit(CancleLoaded());
       if (event.snapshot.value == null) {
         emit(CancleLoading());
@@ -183,8 +307,10 @@ class MapCubit extends Cubit<MapState> {
               MagicRouter.navigateAndPopAll(const HomeScreen());
               assetsAudioPlayer.stop();
               refCancleRide.remove();
+              stopRealTimeDirectionUpdates(); // [NEW] stop timer on client cancel
             });
-        assetsAudioPlayer.play();
+        await assetsAudioPlayer
+            .play(AssetSource('sounds/notification_sound.mp3'));
         emit(CancleLoading());
       }
     });
@@ -217,5 +343,11 @@ class MapCubit extends Cubit<MapState> {
         rideID: rideID,
         startAddress: directionDetails!.startAddress);
     return directionDetails;
+  }
+
+  @override
+  Future<void> close() {
+    stopRealTimeDirectionUpdates();
+    return super.close();
   }
 }
