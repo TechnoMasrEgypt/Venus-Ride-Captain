@@ -16,7 +16,7 @@ if (keystorePropertiesExist) {
 }
 
 android {
-    namespace = "com.technomasr.venusridecaptin"
+    namespace = "com.techmasr.venuscaptin"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -31,7 +31,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.technomasr.venusridecaptin"
+        applicationId = "com.techmasr.venuscaptin"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
