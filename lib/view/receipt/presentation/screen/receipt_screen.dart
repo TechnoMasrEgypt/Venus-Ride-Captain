@@ -7,6 +7,7 @@ import 'package:venus_driver/global_variables.dart';
 import 'package:venus_driver/router/router.dart';
 import 'package:venus_driver/translations/locale_keys.g.dart';
 import 'package:venus_driver/utils/brand_colors.dart';
+import 'package:venus_driver/helpers/helper_methods.dart';
 import 'package:venus_driver/helpers/hex_color.dart';
 import 'package:venus_driver/view/home/presentation/screen/home_screen.dart';
 import 'package:venus_driver/view/profile/presentation/cubit/profile_cubit.dart';
@@ -88,11 +89,9 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                                       ? const LoadingIndicator()
                                       : circlularPercentIndicator(
                                           percent: .6,
-                                          wallets: (cubitDetails
-                                                      .driverData!.wallets /
-                                                  100)
-                                              .toStringAsFixed(2)
-                                              .toString());
+                                          wallets: HelperMethods
+                                              .formatBalance(cubitDetails
+                                                  .driverData!.wallets));
                                 },
                               ),
                               SizedBox(

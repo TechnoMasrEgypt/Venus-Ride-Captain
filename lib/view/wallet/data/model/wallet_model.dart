@@ -23,10 +23,12 @@ class WalletHistoryModel {
 
   factory WalletHistoryModel.fromJson(Map<String, dynamic> json) =>
       WalletHistoryModel(
-        status: json["status"],
-        message: json["message"],
-        data: List<WalletHistoryData>.from(
-            json["data"].map((x) => WalletHistoryData.fromJson(x))),
+        status: json["status"] ?? '',
+        message: json["message"] ?? '',
+        data: json["data"] != null
+            ? List<WalletHistoryData>.from(
+                json["data"].map((x) => WalletHistoryData.fromJson(x)))
+            : [],
       );
 
   Map<String, dynamic> toJson() => {
@@ -57,13 +59,13 @@ class WalletHistoryData {
 
   factory WalletHistoryData.fromJson(Map<String, dynamic> json) =>
       WalletHistoryData(
-        id: json["id"],
-        date: json["date"],
-        cardId: json["card_id"],
-        driverId: json["driver_id"],
+        id: json["id"] ?? 0,
+        date: json["date"] ?? '',
+        cardId: json["card_id"] ?? 0,
+        driverId: json["driver_id"] ?? 0,
         balance: json["balance"],
-        totalBalance: json["totalBalance"],
-        card: Card.fromJson(json["card"]),
+        totalBalance: json["totalBalance"] ?? '',
+        card: Card.fromJson(json["card"] ?? {}),
       );
 
   Map<String, dynamic> toJson() => {
@@ -89,8 +91,8 @@ class Card {
   });
 
   factory Card.fromJson(Map<String, dynamic> json) => Card(
-        id: json["id"],
-        name: json["name"],
+        id: json["id"] ?? 0,
+        name: json["name"] ?? '',
         value: json["value"],
       );
 

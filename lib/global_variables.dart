@@ -15,13 +15,13 @@ const CameraPosition googlePlex = CameraPosition(
   zoom: 14.4746,
 );
 
-DatabaseReference refDriversInfo = FirebaseDatabase.instance
+DatabaseReference get refDriversInfo => FirebaseDatabase.instance
     .ref("Drivers/${CacheHelper.getData(key: 'id').toString()}");
-DatabaseReference refRequset = FirebaseDatabase.instance
+DatabaseReference get refRequset => FirebaseDatabase.instance
     .ref("RequestRide/${CacheHelper.getData(key: 'id').toString()}");
-DatabaseReference refReceiptRide = FirebaseDatabase.instance
+DatabaseReference get refReceiptRide => FirebaseDatabase.instance
     .ref("ReceiptRide/${CacheHelper.getData(key: 'id').toString()}");
-DatabaseReference refCancleRide = FirebaseDatabase.instance
+DatabaseReference get refCancleRide => FirebaseDatabase.instance
     .ref("cancleDriverRides/${CacheHelper.getData(key: 'id').toString()}");
 final assetsAudioPlayer = AudioPlayer();
 

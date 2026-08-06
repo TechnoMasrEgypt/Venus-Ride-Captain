@@ -50,9 +50,14 @@ class LocationService {
     await _ensurePermission();
 
     // Seed immediately so the rest of the app never reads a null position.
-    currentPosition = await Geolocator.getCurrentPosition(
-      desiredAccuracy: _accuracy,
-    );
+    // Timeout so a slow/no GPS fix can never block startup.
+    try {
+      currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: _accuracy,
+      ).timeout(const Duration(seconds: 10));
+    } catch (_) {
+      currentPosition ??= await Geolocator.getLastKnownPosition();
+    }
     await _pushToFirebase(); // first upload right away
 
     _sub = Geolocator.getPositionStream(

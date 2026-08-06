@@ -36,7 +36,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-        child: Column(
+        child: SingleChildScrollView(
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Stack(
@@ -233,7 +234,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
           height: 8,
         ),
       ],
-    ));
+    )));
   }
 }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:firebase_database/firebase_database.dart';
@@ -36,6 +37,8 @@ class HomeCubit extends Cubit<HomeState> {
   RideRequistDetailsData? rideRequistDetailsData;
   TripDetails? tripDetails;
   dynamic checkData;
+  StreamSubscription<DatabaseEvent>? _requestSubscription;
+
   Future updateLocation(double lat, double lng) async {
     final res = await homeRepo.updateLocation(lat, lng);
     res.fold((err) {
@@ -50,8 +53,10 @@ class HomeCubit extends Cubit<HomeState> {
 
   Future acceptDriverRide(
       {required int driverId, required BuildContext context}) async {
+    final details = tripDetails;
+    if (details == null) return;
     emit(HomeLoading());
-    final res = await homeRepo.acceptDriverRide(tripDetails!.ride, driverId);
+    final res = await homeRepo.acceptDriverRide(details.ride, driverId);
     res.fold(
       (err) async {
         await showCancleAlertDialog(
@@ -69,9 +74,9 @@ class HomeCubit extends Cubit<HomeState> {
         emit(HomeInitial());
 
         // [FIX] Write acceptance notification to client BEFORE removing request
-        await _notifyClientDriverAccepted(tripDetails!.ride);
+        await _notifyClientDriverAccepted(details.ride);
 
-        MagicRouter.navigateTo(MapScreen(tripDetails: tripDetails));
+        MagicRouter.navigateTo(MapScreen(tripDetails: details));
 
         await Future.delayed(const Duration(seconds: 2)); // let client read it
         refRequset.remove();
@@ -88,7 +93,7 @@ class HomeCubit extends Cubit<HomeState> {
       'rate': CacheHelper.getData(key: 'rate') ?? 0,
       'type': CacheHelper.getData(key: 'carType'),
       'IDdriver': CacheHelper.getData(key: 'id'),
-      'ride': int.parse(tripDetails!.ride),
+      'ride': int.parse(clientUserId),
     });
   }
 
@@ -119,6 +124,7 @@ class HomeCubit extends Cubit<HomeState> {
   @override
   Future<void> close() {
     LocationService.instance.onLocationUpdated = null;
+    _requestSubscription?.cancel();
     return super.close();
   }
 
@@ -135,56 +141,55 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   Future getRequest() async {
+    if (_requestSubscription != null) return;
     print("Start requestes");
-    refRequset.onValue.listen(
+    _requestSubscription = refRequset.onValue.listen(
       (DatabaseEvent event) async {
         print("start evant ${event.snapshot.value} ");
         print("path " + refRequset.path);
         checkData = event.snapshot.value;
-        emit(GetRequest());
+        if (isClosed) return;
         if (event.snapshot.value == null) {
+          tripDetails = null;
           emit(DoneRequest());
           assetsAudioPlayer.stop();
           return;
-        } else {
+        }
+        try {
           final Map data = event.snapshot.value as Map;
+          tripDetails = TripDetails(
+              clientName: data['client'].toString(),
+              cost: data['cost'].toString(),
+              endTime: data['endTime'].toString(),
+              endTrip: data['endRide'].toString(),
+              startTime: data['startTime'].toString(),
+              phone: data['phone'].toString(),
+              startTrip: data['startRide'].toString(),
+              currentLat: data['currentLat'].toString(),
+              currentLng: data['currentLng'].toString(),
+              distanceLat: data['distanceLat'].toString(),
+              distanceLng: data['distanceLng'].toString(),
+              photo: data['photo'].toString(),
+              ride: data['ride'].toString(),
+              rideType: data['rideType'].toString());
+        } catch (e) {
+          log('[HomeCubit] Failed to parse request: $e');
+          emit(DoneRequest());
+          return;
+        }
+        emit(GetRequest());
+        try {
           await assetsAudioPlayer.play(
             AssetSource('sounds/notification_sound.mp3'),
           );
           print("Doneeeee");
           print("Before launch app");
-          // Add delay before launching app
-          await Future.delayed(Duration(milliseconds: 500));
+          await Future.delayed(const Duration(milliseconds: 500));
           print("After launch app");
-          String startRide = data['startRide'].toString();
-          String endRide = data['endRide'].toString();
-          String phone = data['phone'].toString();
-          String startTime = data['startTime'].toString();
-          String endTime = data['endTime'].toString();
-          String client = data['client'].toString();
-          String cost = data['cost'].toString();
-          String currentLat = data['currentLat'].toString();
-          String currentLng = data['currentLng'].toString();
-          String distanceLat = data['distanceLat'].toString();
-          String distanceLng = data['distanceLng'].toString();
-          String photo = data['photo'].toString();
-          String ride = data['ride'].toString();
-          String rideType = data['rideType'].toString();
-          tripDetails = TripDetails(
-              clientName: client,
-              cost: cost,
-              endTime: endTime,
-              endTrip: endRide,
-              startTime: startTime,
-              phone: phone,
-              startTrip: startRide,
-              currentLat: currentLat,
-              currentLng: currentLng,
-              distanceLat: distanceLat,
-              distanceLng: distanceLng,
-              photo: photo,
-              ride: ride,
-              rideType: rideType);
+        } catch (e) {
+          log('[HomeCubit] Request sound error: $e');
+        } finally {
+          // Always resolve the state so the UI never stays stuck on loading.
           emit(DoneRequest());
         }
       },

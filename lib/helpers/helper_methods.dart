@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:html/parser.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/location_service.dart';
 import '../widgets/ProgressDialog.dart';
 
 class HelperMethods {
+  static String formatBalance(dynamic amount) {
+    final num value = (amount is num ? amount : double.tryParse(amount.toString()) ?? 0) / 100;
+    return NumberFormat('#,##0.00', 'en_US').format(value);
+  }
   static void disableLocationUpdates() {
     LocationService.instance.pauseTracking();
   }

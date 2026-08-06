@@ -153,8 +153,12 @@ class _MapScreenState extends State<MapScreen> {
                           initialCameraPosition: CameraPosition(
                             zoom: 13.5,
                             target: LatLng(
-                              LocationService.instance.currentPosition?.latitude ?? googlePlex.target.latitude,
-                              LocationService.instance.currentPosition?.longitude ?? googlePlex.target.longitude,
+                              LocationService
+                                      .instance.currentPosition?.latitude ??
+                                  googlePlex.target.latitude,
+                              LocationService
+                                      .instance.currentPosition?.longitude ??
+                                  googlePlex.target.longitude,
                             ),
                           ),
                           myLocationEnabled: false,
@@ -168,12 +172,18 @@ class _MapScreenState extends State<MapScreen> {
                           },
                           markers: {
                             Marker(
-                              rotation: LocationService.instance.currentPosition?.heading ?? 0,
+                              rotation: LocationService
+                                      .instance.currentPosition?.heading ??
+                                  0,
                               markerId: const MarkerId("CurrentPosition"),
                               icon: cubit.currentLocationIcon,
                               position: LatLng(
-                                LocationService.instance.currentPosition?.latitude ?? googlePlex.target.latitude,
-                                LocationService.instance.currentPosition?.longitude ?? googlePlex.target.longitude,
+                                LocationService
+                                        .instance.currentPosition?.latitude ??
+                                    googlePlex.target.latitude,
+                                LocationService
+                                        .instance.currentPosition?.longitude ??
+                                    googlePlex.target.longitude,
                               ),
                             ),
                             Marker(
@@ -412,33 +422,48 @@ class _MapScreenState extends State<MapScreen> {
                                           horizontal: 20.w),
                                       child: Row(
                                         children: [
-                                          widget.tripDetails!.rideType !=
-                                                  "not_directed"
-                                              ? Row(
-                                                  children: [
-                                                    Text(
-                                                      LocaleKeys.dinar.tr(),
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 18.0.sp,
-                                                          color: HexColor(
-                                                              '#3E4958')),
+                                          Flexible(
+                                            flex: 1,
+                                            child: widget.tripDetails!
+                                                        .rideType !=
+                                                    "not_directed"
+                                                ? FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    alignment:
+                                                        AlignmentDirectional
+                                                            .centerStart,
+                                                    child: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Text(
+                                                          LocaleKeys.dinar.tr(),
+                                                          style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 18.0.sp,
+                                                              color: HexColor(
+                                                                  '#3E4958')),
+                                                        ),
+                                                        Text(
+                                                          widget.tripDetails!
+                                                              .cost,
+                                                          style: TextStyle(
+                                                              height: 1,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 45.0.sp,
+                                                              color: HexColor(
+                                                                  '#3E4958')),
+                                                        ),
+                                                      ],
                                                     ),
-                                                    Text(
-                                                      widget.tripDetails!.cost,
-                                                      style: TextStyle(
-                                                          height: 1,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 45.0.sp,
-                                                          color: HexColor(
-                                                              '#3E4958')),
-                                                    ),
-                                                  ],
-                                                )
-                                              : const Icon(Icons.attach_money),
-                                          const Spacer(),
+                                                  )
+                                                : const Icon(
+                                                    Icons.attach_money),
+                                          ),
                                           BlocBuilder<ChatCubit, ChatState>(
                                             builder: (context, state) {
                                               final cubit =

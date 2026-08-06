@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:venus_driver/appStorage/local_cache_helper.dart';
 import 'package:venus_driver/global_variables.dart';
+import 'package:venus_driver/helpers/helper_methods.dart';
 import 'package:venus_driver/helpers/hex_color.dart';
 import 'package:venus_driver/router/router.dart';
 import 'package:venus_driver/services/location_service.dart';
@@ -516,10 +517,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       percent: .6,
                                       wallets: cubitDetails.driverData == null
                                           ? ""
-                                          : (cubitDetails.driverData!.wallets /
-                                                  100)
-                                              .toStringAsFixed(2)
-                                              .toString()),
+                                          : HelperMethods.formatBalance(
+                                              cubitDetails.driverData!.wallets)),
                                   SizedBox(height: 30.h),
                                   Padding(
                                     padding:
@@ -544,64 +543,53 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   BlocBuilder<HomeCubit, HomeState>(
                                     builder: (context, state) {
-                                      return state is GetRequest ||
-                                              state is HomeLoading
-                                          ? const LoadingIndicator()
-                                          : Container(
-                                              color: Colors.white,
-                                              height: 320.w,
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              child: cubitDetails.driverData ==
-                                                      null
-                                                  ? Lottie.asset(
-                                                      'assets/json/moving_car.json')
-                                                  : cubitDetails.driverData!.avabile ==
-                                                              'online' &&
-                                                          cubit.checkData !=
-                                                              null
-                                                      ? customRequestCard(
-                                                          context: context,
-                                                          cost: cubit
-                                                              .tripDetails!
-                                                              .cost,
-                                                          endTime: cubit
-                                                              .tripDetails!
-                                                              .endTime,
-                                                          endTrip: cubit
-                                                              .tripDetails!
-                                                              .endTrip,
-                                                          name: cubit
-                                                              .tripDetails!
-                                                              .clientName,
-                                                          startTime: cubit
-                                                              .tripDetails!
-                                                              .startTime,
-                                                          startTrip: cubit
-                                                              .tripDetails!
-                                                              .startTrip,
-                                                          image: cubit
-                                                              .tripDetails!
-                                                              .photo,
-                                                          onTap: () async {
-                                                            await cubit.acceptDriverRide(
-                                                                context:
-                                                                    context,
-                                                                driverId:
-                                                                    cubitDetails
-                                                                        .driverData!
-                                                                        .id);
-                                                            await refRequset
-                                                                .remove();
-                                                          },
-                                                          statusRide:
-                                                              cubit.tripDetails!.rideType ==
-                                                                      "not_directed"
-                                                                  ? true
-                                                                  : false)
-                                                      : Lottie.asset('assets/json/moving_car.json'),
-                                            );
+                                      final trip = cubit.tripDetails;
+                                      final hasRequest = cubit.checkData !=
+                                              null &&
+                                          trip != null;
+                                      final showLoading =
+                                          (state is GetRequest ||
+                                                  state is HomeLoading) &&
+                                              !hasRequest;
+                                      if (showLoading) {
+                                        return const LoadingIndicator();
+                                      }
+                                      return Container(
+                                        color: Colors.white,
+                                        height: 320.w,
+                                        width: MediaQuery.of(context)
+                                            .size
+                                            .width,
+                                        child: cubitDetails.driverData ==
+                                                    null ||
+                                                cubitDetails.driverData!.avabile !=
+                                                    'online' ||
+                                                trip == null
+                                            ? Lottie.asset(
+                                                'assets/json/moving_car.json')
+                                            : customRequestCard(
+                                                context: context,
+                                                cost: trip.cost,
+                                                endTime: trip.endTime,
+                                                endTrip: trip.endTrip,
+                                                name: trip.clientName,
+                                                startTime: trip.startTime,
+                                                startTrip: trip.startTrip,
+                                                image: trip.photo,
+                                                onTap: () async {
+                                                  await cubit.acceptDriverRide(
+                                                      context: context,
+                                                      driverId: cubitDetails
+                                                          .driverData!
+                                                          .id);
+                                                  await refRequset.remove();
+                                                },
+                                                statusRide:
+                                                    trip.rideType ==
+                                                            "not_directed"
+                                                        ? true
+                                                        : false),
+                                      );
                                     },
                                   )
                                 ],

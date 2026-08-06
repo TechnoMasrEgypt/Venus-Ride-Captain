@@ -34,41 +34,57 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // _navigateToScreenFromNotification();
 }
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    //   name: "VenusCaptin",
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  setupPushNotifications();
+void main() {
+  // ── Run everything inside a Crashlytics‑guarded zone ────────────────
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  await EasyLocalization.ensureInitialized();
-  runZonedGuarded<Future<void>>(() async {
+    // ── Initialise services before running the app ────────────────────
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    await EasyLocalization.ensureInitialized();
+    await CacheHelper.init();
+    Bloc.observer = AppBlocObserver();
+    await WakelockPlus.enable();
+    await _initNotifications();
+
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-  },
-      (error, stack) =>
-          FirebaseCrashlytics.instance.recordError(error, stack, fatal: true));
-  await CacheHelper.init();
-  Bloc.observer = AppBlocObserver();
-  WakelockPlus.enable();
+    runApp(EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('ar')],
+      assetLoader: const CodegenLoader(),
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      child: DevicePreview(enabled: false, builder: (_) => MyApp()),
+    ));
+  }, (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+  });
+}
+
+Future<void> _initNotifications() async {
+  await setupPushNotifications();
+
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-      providesAppNotificationSettings: true);
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+    providesAppNotificationSettings: true,
+  );
 
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'high_importance_channel', // id
-    'High Importance Notifications', // title
-    // description
-    sound:RawResourceAndroidNotificationSound('notification_sound') ,
+    'high_importance_channel',
+    'High Importance Notifications',
+    sound: RawResourceAndroidNotificationSound('notification_sound'),
     importance: Importance.max,
   );
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -79,14 +95,9 @@ void main() async {
           AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
-  print('User granted permission: ${settings.authorizationStatus}');
-  /*FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Got a message whilst in the foreground!');
-    print('Message data: ${message.data}');
+  print('User granted permission: '
+      '${settings.authorizationStatus}');
 
-    if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-    }*/
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');
     print('Message data: ${message.data}');
@@ -95,41 +106,36 @@ void main() async {
       print('Message also contained a notification: ${message.notification}');
     }
   });
+
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
-    //RemoteNotification? android = message.notification!;
 
     if (notification != null) {
       flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'high_importance_channel',
-              'channel name',
-              channelDescription: 'channel description',
-              sound: RawResourceAndroidNotificationSound('notification_sound') ,
-              priority: Priority.high,
-              importance: Importance.high,
-              fullScreenIntent: true,
-              icon: '@mipmap/ic_launcher',
-            ),
-            iOS: DarwinNotificationDetails(
-              sound: 'notification_sound.caf',
-              presentAlert: true,
-              presentSound: true,
-              presentBadge: true,
-            ),
-          ));
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'high_importance_channel',
+            'channel name',
+            channelDescription: 'channel description',
+            sound: RawResourceAndroidNotificationSound('notification_sound'),
+            priority: Priority.high,
+            importance: Importance.high,
+            fullScreenIntent: true,
+            icon: '@mipmap/ic_launcher',
+          ),
+          iOS: DarwinNotificationDetails(
+            sound: 'notification_sound.caf',
+            presentAlert: true,
+            presentSound: true,
+            presentBadge: true,
+          ),
+        ),
+      );
     }
   });
-  runApp(EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('ar')],
-      assetLoader: const CodegenLoader(),
-      path: 'assets/translations',
-      fallbackLocale: const Locale('en'),
-      child: DevicePreview(enabled: false, builder: (_) => MyApp())));
 }
 
 Future<void> setupPushNotifications() async {

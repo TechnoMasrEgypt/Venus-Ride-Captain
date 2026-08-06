@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
+import 'package:venus_driver/helpers/helper_methods.dart';
 import 'package:venus_driver/translations/locale_keys.g.dart';
 import 'package:venus_driver/utils/brand_colors.dart';
 import 'package:venus_driver/view/profile/presentation/cubit/profile_cubit.dart';
@@ -69,11 +70,9 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                       ? const LoadingIndicator()
                                       : circlularPercentIndicator(
                                           percent: .6,
-                                          wallets: (cubitDetails
-                                                      .driverData!.wallets /
-                                                  100)
-                                              .toStringAsFixed(2)
-                                              .toString());
+                                          wallets: HelperMethods
+                                              .formatBalance(cubitDetails
+                                                  .driverData!.wallets));
                                 },
                               ),
                               Padding(
@@ -115,12 +114,10 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                                       .listOfWalletHistory[
                                                           index]
                                                       .date,
-                                                  wallet: (cubit
-                                                              .listOfWalletHistory[
-                                                                  index]
-                                                              .balance /
-                                                          100)
-                                                      .toString());
+                                                  wallet: HelperMethods.formatBalance(cubit
+                                                      .listOfWalletHistory[
+                                                          index]
+                                                      .balance));
                                             },
                                             separatorBuilder:
                                                 (BuildContext context,

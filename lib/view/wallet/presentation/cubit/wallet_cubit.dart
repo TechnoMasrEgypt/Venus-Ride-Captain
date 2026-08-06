@@ -27,6 +27,7 @@ class WalletCubit extends Cubit<WalletState> {
       },
       (res) async {
         listOfWalletHistory = res.data;
+        print ("Wallet History : ${listOfWalletHistory.length}");
         emit(WalletInitial());
       },
     );
